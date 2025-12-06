@@ -9,163 +9,144 @@ export function SignInForm() {
   const [submitting, setSubmitting] = useState(false);
 
   return (
-    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      {/* Left side - Image/Branding */}
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-        <div className="absolute inset-0 bg-zinc-900" />
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-6 w-6"
-          >
-            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-          </svg>
-          Acme Feedback
+    <div className="min-h-screen flex items-center justify-center bg-[#09090b] p-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-900/30">
+              <span className="font-bold text-lg tracking-tighter">Ac</span>
+            </div>
+            <span className="text-xl font-bold text-neutral-100">Acme Feedback</span>
+          </div>
         </div>
-        <div className="relative z-20 mt-auto">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
-              "This feedback platform has saved us countless hours of work and helped us ship better products faster."
-            </p>
-            <footer className="text-sm">Sofia Davis</footer>
-          </blockquote>
-        </div>
-      </div>
 
-      {/* Right side - Form */}
-      <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          <div className="flex flex-col space-y-2 text-center">
-            <h1 className="text-2xl font-semibold tracking-tight">
+        {/* Card */}
+        <div className="bg-[#161616] rounded-2xl border border-white/5 p-8">
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-bold text-neutral-100 mb-2">
               {flow === "signIn" ? "Welcome back" : "Create an account"}
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-neutral-500">
               {flow === "signIn"
                 ? "Enter your email to sign in to your account"
                 : "Enter your email below to create your account"}
             </p>
           </div>
 
-          <div className="grid gap-6">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                setSubmitting(true);
-                const formData = new FormData(e.target as HTMLFormElement);
-                formData.set("flow", flow);
-                void signIn("password", formData).catch((error) => {
-                  let toastTitle = "";
-                  if (error.message.includes("Invalid password")) {
-                    toastTitle = "Invalid password. Please try again.";
-                  } else {
-                    toastTitle =
-                      flow === "signIn"
-                        ? "Could not sign in, did you mean to sign up?"
-                        : "Could not sign up, did you mean to sign in?";
-                  }
-                  toast.error(toastTitle);
-                  setSubmitting(false);
-                });
-              }}
-            >
-              <div className="grid gap-2">
-                <div className="grid gap-1">
-                  <label className="sr-only" htmlFor="email">
-                    Email
-                  </label>
-                  <input
-                    id="email"
-                    placeholder="name@example.com"
-                    type="email"
-                    name="email"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    autoCorrect="off"
-                    disabled={submitting}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    required
-                  />
-                </div>
-                <div className="grid gap-1">
-                  <label className="sr-only" htmlFor="password">
-                    Password
-                  </label>
-                  <input
-                    id="password"
-                    placeholder="Password"
-                    type="password"
-                    name="password"
-                    autoCapitalize="none"
-                    autoComplete={flow === "signIn" ? "current-password" : "new-password"}
-                    autoCorrect="off"
-                    disabled={submitting}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    required
-                  />
-                </div>
-                <button
-                  disabled={submitting}
-                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
-                  type="submit"
-                >
-                  {submitting && (
-                    <svg
-                      className="mr-2 h-4 w-4 animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                  )}
-                  {flow === "signIn" ? "Sign In with Email" : "Sign Up with Email"}
-                </button>
-              </div>
-            </form>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setSubmitting(true);
+              const formData = new FormData(e.target as HTMLFormElement);
+              formData.set("flow", flow);
+              void signIn("password", formData).catch((error) => {
+                let toastTitle = "";
+                if (error.message.includes("Invalid password")) {
+                  toastTitle = "Invalid password. Please try again.";
+                } else {
+                  toastTitle =
+                    flow === "signIn"
+                      ? "Could not sign in, did you mean to sign up?"
+                      : "Could not sign up, did you mean to sign in?";
+                }
+                toast.error(toastTitle);
+                setSubmitting(false);
+              });
+            }}
+            className="space-y-4"
+          >
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-2">
+                Email
+              </label>
+              <input
+                id="email"
+                placeholder="name@example.com"
+                type="email"
+                name="email"
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect="off"
+                disabled={submitting}
+                className="w-full px-4 py-3 rounded-xl bg-[#1E1E1E] border border-white/10 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-neutral-200 placeholder:text-neutral-600 disabled:opacity-50"
+                required
+              />
+            </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">
-                  Or continue with
-                </span>
-              </div>
+            <div>
+              <label className="block text-xs font-medium text-neutral-400 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                placeholder="Password"
+                type="password"
+                name="password"
+                autoCapitalize="none"
+                autoComplete={flow === "signIn" ? "current-password" : "new-password"}
+                autoCorrect="off"
+                disabled={submitting}
+                className="w-full px-4 py-3 rounded-xl bg-[#1E1E1E] border border-white/10 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-neutral-200 placeholder:text-neutral-600 disabled:opacity-50"
+                required
+              />
             </div>
 
             <button
-              type="button"
-              onClick={() => void signIn("anonymous")}
               disabled={submitting}
-              className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2"
+              className="w-full px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              type="submit"
             >
-              Continue as Guest
+              {submitting && (
+                <svg
+                  className="mr-2 h-4 w-4 animate-spin"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              )}
+              {flow === "signIn" ? "Sign In" : "Sign Up"}
             </button>
+          </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-[#161616] px-3 text-neutral-500">
+                Or continue with
+              </span>
+            </div>
           </div>
 
-          <p className="px-8 text-center text-sm text-muted-foreground">
+          <button
+            type="button"
+            onClick={() => void signIn("anonymous")}
+            disabled={submitting}
+            className="w-full px-4 py-3 rounded-xl bg-[#1E1E1E] border border-white/10 text-neutral-300 font-medium hover:bg-[#252525] hover:border-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Continue as Guest
+          </button>
+
+          <p className="mt-6 text-center text-sm text-neutral-500">
             <button
               type="button"
-              className="hover:text-brand underline underline-offset-4"
+              className="text-blue-400 hover:text-blue-300 underline underline-offset-4 transition-colors"
               onClick={() => setFlow(flow === "signIn" ? "signUp" : "signIn")}
             >
               {flow === "signIn"
@@ -173,6 +154,14 @@ export function SignInForm() {
                 : "Already have an account? Sign In"}
             </button>
           </p>
+        </div>
+
+        {/* Footer Quote */}
+        <div className="mt-8 text-center">
+          <p className="text-sm text-neutral-600 italic">
+            "This feedback platform helped us ship better products faster."
+          </p>
+          <p className="text-xs text-neutral-700 mt-1">- Sofia Davis</p>
         </div>
       </div>
     </div>

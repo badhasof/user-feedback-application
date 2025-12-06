@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
@@ -6,32 +6,47 @@ import {
   Search,
   Filter,
   Plus,
-  CheckCircle2,
-  Clock,
-  Zap,
   CornerDownRight,
   X,
-  LogOut
+  LogOut,
+  LayoutGrid,
+  List,
+  ArrowUpDown
 } from 'lucide-react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { getSessionId } from "../lib/session";
 import { useAuthActions } from "@convex-dev/auth/react";
+import { KanbanBoard, ListView } from "./Kanban";
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+function cn(...inputs: (string | undefined | null | boolean)[]) {
+  return twMerge(clsx(inputs));
+}
+
+// --- Column Configuration (matching the UI component) ---
+const COLUMNS = [
+  { id: "no-status", title: "No Status", color: "neutral", statusLabel: null },
+  { id: "not-started", title: "Not Started", color: "grey", statusLabel: "Not Started" },
+  { id: "in-progress", title: "In Progress", color: "blue", statusLabel: "In Progress" },
+  { id: "completed", title: "Completed", color: "green", statusLabel: "Completed" }
+];
 
 // --- Components ---
 
-const StatusBadge = ({ status }) => {
-  const styles = {
-    'new': 'bg-zinc-100 text-zinc-500 border-zinc-200',
-    'under-review': 'bg-zinc-100 text-zinc-500 border-zinc-200',
-    'planned': 'bg-blue-50 text-blue-600 border-blue-100',
-    'in-progress': 'bg-amber-50 text-amber-600 border-amber-100',
-    'resolved': 'bg-emerald-50 text-emerald-600 border-emerald-100',
-    'live': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+const StatusBadge = ({ status }: { status: string }) => {
+  const styles: Record<string, string> = {
+    'new': 'bg-neutral-800 text-neutral-400 border-neutral-700',
+    'under-review': 'bg-neutral-800 text-neutral-400 border-neutral-700',
+    'planned': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+    'in-progress': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    'resolved': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    'live': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
   };
 
-  const labels = {
+  const labels: Record<string, string> = {
     'new': 'New',
     'under-review': 'Under Review',
     'planned': 'Planned',
@@ -47,17 +62,17 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const UpvoteButton = ({ votes, active, onClick }) => (
+const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boolean; onClick: (e: React.MouseEvent) => void }) => (
   <button
     onClick={onClick}
-    className={`group flex flex-col items-center justify-center w-12 h-14 rounded-xl border transition-all duration-200 ${active ? 'bg-zinc-900 border-zinc-900 text-white' : 'bg-white border-zinc-200 text-zinc-500 hover:border-zinc-300 hover:shadow-sm'}`}
+    className={`group flex flex-col items-center justify-center w-12 h-14 rounded-xl border transition-all duration-200 ${active ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-[#1E1E1E] border-neutral-700 text-neutral-400 hover:border-neutral-600 hover:text-neutral-300'}`}
   >
-    <ChevronUp size={18} className={`mb-1 transition-transform group-hover:-translate-y-0.5 ${active ? 'text-white' : 'text-zinc-400'}`} />
+    <ChevronUp size={18} className={`mb-1 transition-transform group-hover:-translate-y-0.5 ${active ? 'text-blue-400' : 'text-neutral-500'}`} />
     <span className="text-xs font-bold">{votes}</span>
   </button>
 );
 
-const FeedbackCard = ({ item, hasVoted, onVote }) => {
+const FeedbackCard = ({ item, hasVoted, onVote }: { item: any; hasVoted: boolean; onVote: () => void }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const addComment = useMutation(api.comments.addComment);
@@ -102,13 +117,20 @@ const FeedbackCard = ({ item, hasVoted, onVote }) => {
     }
   };
 
+  const getCategoryStyle = (category?: string) => {
+    if (category === "Feature") return "bg-[#1e2738] text-[#60a5fa] border border-[#2b3a55]";
+    if (category === "Improvement") return "bg-[#192b23] text-[#4ade80] border border-[#223d2e]";
+    if (category === "Bug") return "bg-[#351c1c] text-[#f87171] border border-[#452222]";
+    return "bg-neutral-800 text-neutral-400 border border-neutral-700";
+  };
+
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-white rounded-2xl border border-zinc-100 hover:border-zinc-200 hover:shadow-lg hover:shadow-zinc-100/50 transition-all duration-300 group overflow-hidden"
+      className="bg-[#161616] rounded-2xl border border-white/5 hover:border-white/10 transition-all duration-300 group overflow-hidden"
     >
       <div className="flex gap-4 p-6 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="hidden sm:block">
@@ -118,33 +140,38 @@ const FeedbackCard = ({ item, hasVoted, onVote }) => {
         <div className="flex-1 space-y-2">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <h3 className="font-semibold text-zinc-900 group-hover:text-blue-600 transition-colors">{item.title}</h3>
+              <h3 className="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">{item.title}</h3>
               <div className="flex items-center gap-2 sm:hidden">
                 <button
                   onClick={(e) => { e.stopPropagation(); onVote(); }}
-                  className="text-xs font-bold text-zinc-500 flex items-center gap-1 hover:text-zinc-900"
+                  className="text-xs font-bold text-neutral-500 flex items-center gap-1 hover:text-neutral-300"
                 >
-                  <ChevronUp size={12} className={hasVoted ? 'fill-current' : ''} /> {item.votes}
+                  <ChevronUp size={12} className={hasVoted ? 'fill-current text-blue-400' : ''} /> {item.votes}
                 </button>
-                <span className="text-zinc-300">•</span>
+                <span className="text-neutral-700">|</span>
                 <StatusBadge status={item.status} />
               </div>
             </div>
-            <div className="hidden sm:block">
+            <div className="hidden sm:flex items-center gap-2">
+              {item.category && (
+                <span className={cn("text-[10px] font-medium px-2 py-0.5 rounded-md", getCategoryStyle(item.category))}>
+                  {item.category}
+                </span>
+              )}
               <StatusBadge status={item.status} />
             </div>
           </div>
 
-          <p className="text-sm text-zinc-500 leading-relaxed line-clamp-2">{item.description}</p>
+          <p className="text-sm text-neutral-400 leading-relaxed line-clamp-2">{item.description}</p>
 
-          <div className="flex items-center gap-4 pt-2 text-xs text-zinc-400 font-medium">
+          <div className="flex items-center gap-4 pt-2 text-xs text-neutral-500 font-medium">
             <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-zinc-200 to-zinc-300 flex items-center justify-center text-[8px] text-zinc-600 font-bold">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-neutral-700 to-neutral-600 flex items-center justify-center text-[8px] text-neutral-300 font-bold">
                 {item.isAnonymous ? '?' : 'U'}
               </div>
               <span>{item.isAnonymous ? 'Anonymous' : 'User'}</span>
             </div>
-            <button className="flex items-center gap-1 hover:text-zinc-600 transition-colors">
+            <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
               <MessageSquare size={12} />
               <span>{commentCount || 0} comments</span>
             </button>
@@ -158,40 +185,37 @@ const FeedbackCard = ({ item, hasVoted, onVote }) => {
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="border-t border-zinc-100 px-6 pb-6"
+          className="border-t border-white/5 px-6 pb-6"
         >
           <div className="pt-4 space-y-4">
-            {/* Full Description */}
             <div>
-              <p className="text-sm text-zinc-600 leading-relaxed">{item.description}</p>
+              <p className="text-sm text-neutral-300 leading-relaxed">{item.description}</p>
             </div>
 
-            {/* Comments Section */}
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold text-zinc-900 uppercase tracking-wider">Comments</h4>
+              <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Comments</h4>
 
               {comments === undefined ? (
                 <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-zinc-200 border-t-zinc-900 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-neutral-700 border-t-neutral-400 mx-auto"></div>
                 </div>
               ) : comments.length === 0 ? (
-                <p className="text-xs text-zinc-400 py-2">No comments yet. Be the first to comment!</p>
+                <p className="text-xs text-neutral-600 py-2">No comments yet. Be the first to comment!</p>
               ) : (
                 comments.map((comment) => (
-                  <div key={comment._id} className="bg-zinc-50 rounded-lg p-3 space-y-2">
+                  <div key={comment._id} className="bg-[#1E1E1E] rounded-lg p-3 space-y-2 border border-white/5">
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-zinc-300 to-zinc-400 flex items-center justify-center text-[7px] text-zinc-700 font-bold">
+                      <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-neutral-600 to-neutral-500 flex items-center justify-center text-[7px] text-neutral-300 font-bold">
                         {comment.isAnonymous ? '?' : comment.userName?.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-xs font-medium text-zinc-700">{comment.userName}</span>
-                      <span className="text-[10px] text-zinc-400">{formatDate(comment._creationTime)}</span>
+                      <span className="text-xs font-medium text-neutral-300">{comment.userName}</span>
+                      <span className="text-[10px] text-neutral-600">{formatDate(comment._creationTime)}</span>
                     </div>
-                    <p className="text-xs text-zinc-600 leading-relaxed">{comment.content}</p>
+                    <p className="text-xs text-neutral-400 leading-relaxed">{comment.content}</p>
                   </div>
                 ))
               )}
 
-              {/* Add Comment Form */}
               <div className="flex gap-2 pt-2">
                 <input
                   type="text"
@@ -199,12 +223,12 @@ const FeedbackCard = ({ item, hasVoted, onVote }) => {
                   onChange={(e) => setNewComment(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
                   placeholder="Add a comment..."
-                  className="flex-1 px-3 py-2 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-300"
+                  className="flex-1 px-3 py-2 text-sm bg-[#1E1E1E] border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 text-neutral-200 placeholder:text-neutral-600"
                   onClick={(e) => e.stopPropagation()}
                 />
                 <button
                   onClick={(e) => { e.stopPropagation(); handleAddComment(); }}
-                  className="px-4 py-2 bg-zinc-900 text-white text-xs font-medium rounded-lg hover:bg-zinc-800 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors"
                 >
                   Post
                 </button>
@@ -217,46 +241,7 @@ const FeedbackCard = ({ item, hasVoted, onVote }) => {
   );
 };
 
-const RoadmapColumn = ({ title, status, items, icon: Icon, colorClass }) => (
-  <div className="min-w-[280px] flex-1 flex flex-col gap-4">
-    <div className="flex items-center gap-2 pb-2 border-b border-zinc-100 mb-2">
-      <Icon size={16} className={colorClass} />
-      <h3 className="font-semibold text-sm text-zinc-900">{title}</h3>
-      <span className="ml-auto text-xs bg-zinc-100 text-zinc-500 px-2 py-0.5 rounded-full">{items.length}</span>
-    </div>
-    <div className="space-y-3">
-      {items.map(item => (
-        <motion.div
-          key={item._id}
-          layout
-          className="p-4 bg-white rounded-xl border border-zinc-100 hover:shadow-md transition-all cursor-pointer group relative overflow-hidden"
-        >
-          <div className={`absolute top-0 left-0 w-1 h-full ${colorClass.replace('text-', 'bg-')} opacity-0 group-hover:opacity-100 transition-opacity`}></div>
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-medium text-zinc-400">{item.category}</span>
-            <div className="flex items-center gap-1 text-xs font-bold text-zinc-600">
-              <ChevronUp size={12} /> {item.votes}
-            </div>
-          </div>
-          <h4 className="text-sm font-semibold text-zinc-900 mb-1 leading-snug">{item.title}</h4>
-          <p className="text-xs text-zinc-500 line-clamp-2 mt-1">{item.description}</p>
-          {item.quarter && (
-            <div className="flex items-center gap-2 mt-3 text-[10px] text-zinc-400">
-              {item.quarter}
-            </div>
-          )}
-        </motion.div>
-      ))}
-      {items.length === 0 && (
-        <div className="h-32 border-2 border-dashed border-zinc-100 rounded-xl flex items-center justify-center text-xs text-zinc-300">
-          No items yet
-        </div>
-      )}
-    </div>
-  </div>
-);
-
-const CreatePostInput = ({ onSubmit, category }) => {
+const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, description: string, category: string) => Promise<void>; category: string }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -276,28 +261,28 @@ const CreatePostInput = ({ onSubmit, category }) => {
   return (
     <motion.div
       layout
-      className={`bg-white border border-zinc-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow ${isExpanded ? 'p-6 ring-2 ring-zinc-900/5' : 'p-2 items-center flex gap-3'}`}
+      className={`bg-[#161616] border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 transition-all ${isExpanded ? 'p-6 ring-2 ring-blue-500/10' : 'p-2 items-center flex gap-3'}`}
     >
       {!isExpanded ? (
         <>
-          <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-zinc-400 ml-2">
+          <div className="w-8 h-8 rounded-lg bg-[#1E1E1E] flex items-center justify-center text-neutral-500 ml-2">
             <Plus size={18} />
           </div>
           <input
             type="text"
             placeholder="I have a suggestion..."
-            className="flex-1 bg-transparent text-sm outline-none h-10 text-zinc-600 placeholder:text-zinc-400"
+            className="flex-1 bg-transparent text-sm outline-none h-10 text-neutral-300 placeholder:text-neutral-600"
             onFocus={() => setIsExpanded(true)}
           />
-          <button className="bg-zinc-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors">
+          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors">
             Submit
           </button>
         </>
       ) : (
         <div className="space-y-4">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-semibold text-zinc-900">Create a new post</h3>
-            <button onClick={() => setIsExpanded(false)} className="text-zinc-400 hover:text-zinc-600">
+            <h3 className="text-sm font-semibold text-neutral-200">Create a new post</h3>
+            <button onClick={() => setIsExpanded(false)} className="text-neutral-500 hover:text-neutral-300">
               <X size={16} />
             </button>
           </div>
@@ -307,18 +292,18 @@ const CreatePostInput = ({ onSubmit, category }) => {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Short, descriptive title"
-            className="w-full text-lg font-medium placeholder:text-zinc-300 outline-none border-b border-zinc-100 pb-2"
+            className="w-full text-lg font-medium placeholder:text-neutral-600 outline-none border-b border-white/5 pb-2 bg-transparent text-neutral-200"
           />
           <textarea
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your suggestion in detail..."
-            className="w-full text-sm text-zinc-600 placeholder:text-zinc-300 outline-none resize-none"
+            className="w-full text-sm text-neutral-300 placeholder:text-neutral-600 outline-none resize-none bg-transparent"
           />
-          <div className="flex justify-end gap-2 pt-2 border-t border-zinc-50">
-            <button onClick={() => setIsExpanded(false)} className="px-4 py-2 text-sm text-zinc-500 hover:text-zinc-900 font-medium">Cancel</button>
-            <button onClick={handleSubmit} className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 flex items-center gap-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
+            <button onClick={() => setIsExpanded(false)} className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-300 font-medium">Cancel</button>
+            <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 flex items-center gap-2">
               Submit Post <CornerDownRight size={14} />
             </button>
           </div>
@@ -328,9 +313,53 @@ const CreatePostInput = ({ onSubmit, category }) => {
   );
 };
 
+// Kanban Header - copied from UI App.jsx
+const KanbanHeader = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
+  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 mb-6">
+    <div className="flex items-center gap-2 bg-[#1E1E1E] p-1 rounded-lg border border-white/5">
+      <button
+        onClick={() => setViewMode("list")}
+        className={cn(
+          "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded transition-all",
+          viewMode === "list"
+            ? "bg-[#2C2C2C] text-neutral-100 shadow-sm border border-white/5"
+            : "text-neutral-400 hover:text-neutral-200"
+        )}
+      >
+        <LayoutGrid size={16} />
+        Default view
+      </button>
+      <button
+        onClick={() => setViewMode("board")}
+        className={cn(
+          "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded transition-all",
+          viewMode === "board"
+            ? "bg-[#2C2C2C] text-neutral-100 shadow-sm border border-white/5"
+            : "text-neutral-400 hover:text-neutral-200"
+        )}
+      >
+        <List size={16} className="rotate-90" />
+        Board
+      </button>
+    </div>
+
+    <div className="flex items-center gap-4 ml-auto">
+      <div className="flex items-center gap-3 text-neutral-400">
+        <button className="hover:text-neutral-200 transition-colors"><Filter size={18} /></button>
+        <button className="hover:text-neutral-200 transition-colors"><ArrowUpDown size={18} /></button>
+        <button className="hover:text-neutral-200 transition-colors"><Search size={18} /></button>
+      </div>
+      <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20">
+        New <div className="h-4 w-px bg-blue-400/50 mx-1" /><Plus size={16} />
+      </button>
+    </div>
+  </div>
+);
+
 const Dashboard = ({ user }: { user: any }) => {
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState('board');
   const { signOut } = useAuthActions();
 
   // Database hooks
@@ -371,7 +400,7 @@ const Dashboard = ({ user }: { user: any }) => {
   };
 
   // Get voted items set
-  const votedItems = new Set(
+  const votedFeedbackItems = new Set(
     userVotes?.filter((v) => v.itemType === "feedback").map((v) => v.itemId) || []
   );
 
@@ -391,75 +420,102 @@ const Dashboard = ({ user }: { user: any }) => {
 
   const filteredItems = getFilteredItems();
 
+  // Transform roadmap items for Kanban - matching original UI pattern exactly
+  // useState with initial data, useEffect to sync when DB changes
+  const [tasks, setTasks] = useState<Array<{
+    id: string;
+    columnId: string;
+    title: string;
+    desc: string;
+    tag: string;
+    priority: "High" | "Medium" | "Low";
+  }>>([]);
+
+  // Sync local state when roadmap items load/change from DB
+  useEffect(() => {
+    if (roadmapItems) {
+      setTasks(roadmapItems.map(item => ({
+        id: item._id,
+        columnId: item.status === 'planned' ? 'not-started' :
+                  item.status === 'in-progress' ? 'in-progress' :
+                  item.status === 'live' ? 'completed' : 'no-status',
+        title: item.title,
+        desc: item.description || '',
+        tag: item.category || '',
+        priority: "High" as const,
+      })));
+    }
+  }, [roadmapItems]);
+
   return (
-    <div className="min-h-screen bg-[#FAFAFA] font-sans text-zinc-900">
+    <div className="min-h-screen bg-[#09090b] font-sans text-neutral-200">
       {/* Header Area */}
-      <header className="bg-white border-b border-zinc-100 sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
+      <header className="bg-[#0f0f10] border-b border-white/5 sticky top-0 z-20">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-zinc-900 rounded-lg flex items-center justify-center text-white shadow-md shadow-zinc-200">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-900/30">
               <span className="font-bold text-sm tracking-tighter">Ac</span>
             </div>
             <div>
-              <h1 className="text-sm font-bold text-zinc-900 leading-none">Acme Feedback</h1>
-              <p className="text-[10px] text-zinc-400 font-medium mt-0.5">Public Roadmap & Request Board</p>
+              <h1 className="text-sm font-bold text-neutral-100 leading-none">Acme Feedback</h1>
+              <p className="text-[10px] text-neutral-500 font-medium mt-0.5">Public Roadmap & Request Board</p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <button
               onClick={() => signOut()}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-500 hover:bg-white/5 hover:text-neutral-300 transition-colors"
             >
               <LogOut size={14} /> Sign Out
             </button>
-            <div className="w-8 h-8 rounded-full bg-zinc-100 border border-zinc-200 overflow-hidden">
-              <img src="https://api.dicebear.com/7.x/notionists/svg?seed=Felix" alt="User" className="w-full h-full opacity-80" />
+            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-[#09090b]">
+              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto px-4 md:px-6 py-8 md:py-12">
-        
+      <main className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
+
         {/* Hero / Intro */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
           <div className="space-y-2 max-w-lg">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900">Help us build a better product.</h2>
-            <p className="text-zinc-500 text-sm md:text-base">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-100">Help us build a better product.</h2>
+            <p className="text-neutral-500 text-sm md:text-base">
               Vote on existing requests or suggest a new feature. We read every piece of feedback.
             </p>
           </div>
-          
+
           {/* Search Bar */}
           <div className="w-full md:w-64 relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 group-focus-within:text-zinc-600 transition-colors" size={16} />
-            <input 
-              type="text" 
-              placeholder="Search feedback..." 
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-neutral-400 transition-colors" size={16} />
+            <input
+              type="text"
+              placeholder="Search feedback..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-zinc-200 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-zinc-100 transition-all shadow-sm"
+              className="w-full bg-[#161616] border border-white/5 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all text-neutral-200 placeholder:text-neutral-600"
             />
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex overflow-x-auto no-scrollbar border-b border-zinc-200 mb-8 gap-8">
+        <div className="flex overflow-x-auto no-scrollbar border-b border-white/5 mb-8 gap-8">
           {['features', 'bugs', 'roadmap'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`relative pb-4 text-sm font-medium capitalize transition-colors whitespace-nowrap ${
-                activeTab === tab ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-700'
+                activeTab === tab ? 'text-neutral-100' : 'text-neutral-500 hover:text-neutral-300'
               }`}
             >
               {tab === 'features' ? 'Feature Requests' : tab === 'bugs' ? 'Bug Reports' : 'Roadmap'}
               {activeTab === tab && (
-                <motion.div 
+                <motion.div
                   layoutId="activeTab"
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-zinc-900"
+                  className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500"
                 />
               )}
             </button>
@@ -469,39 +525,31 @@ const Dashboard = ({ user }: { user: any }) => {
         {/* Tab Content */}
         <div className="min-h-[400px]">
           {activeTab === 'roadmap' ? (
-            // Roadmap Kanban View
+            // Roadmap Kanban View - using exact UI component
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex flex-col md:flex-row gap-6 overflow-x-auto pb-4"
             >
               {roadmapItems === undefined ? (
                 <div className="text-center py-12 w-full">
-                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-zinc-200 border-t-zinc-900 mx-auto"></div>
+                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                </div>
+              ) : roadmapItems.length === 0 ? (
+                <div className="text-center py-16">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#161616] flex items-center justify-center">
+                    <LayoutGrid size={24} className="text-neutral-600" />
+                  </div>
+                  <p className="text-lg font-medium text-neutral-400">Roadmap coming soon</p>
+                  <p className="text-sm text-neutral-600 mt-1">Check back later for updates on our plans</p>
                 </div>
               ) : (
                 <>
-                  <RoadmapColumn
-                    title="Planned"
-                    status="planned"
-                    items={(roadmapItems || []).filter(i => i.status === 'planned')}
-                    icon={CheckCircle2}
-                    colorClass="text-blue-500"
-                  />
-                  <RoadmapColumn
-                    title="In Progress"
-                    status="in-progress"
-                    items={(roadmapItems || []).filter(i => i.status === 'in-progress')}
-                    icon={Clock}
-                    colorClass="text-amber-500"
-                  />
-                  <RoadmapColumn
-                    title="Live"
-                    status="live"
-                    items={(roadmapItems || []).filter(i => i.status === 'live')}
-                    icon={Zap}
-                    colorClass="text-emerald-500"
-                  />
+                  <KanbanHeader viewMode={viewMode} setViewMode={setViewMode} />
+                  {viewMode === "board" ? (
+                    <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} />
+                  ) : (
+                    <ListView tasks={tasks} columns={COLUMNS} />
+                  )}
                 </>
               )}
             </motion.div>
@@ -513,9 +561,9 @@ const Dashboard = ({ user }: { user: any }) => {
                 category={activeTab === 'bugs' ? 'Bug' : 'Feature'}
               />
 
-              <div className="flex justify-between items-center text-xs text-zinc-400 font-medium uppercase tracking-wider">
+              <div className="flex justify-between items-center text-xs text-neutral-500 font-medium uppercase tracking-wider">
                 <span>{filteredItems.length} Posts</span>
-                <button className="flex items-center gap-1 hover:text-zinc-600">
+                <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
                   <Filter size={12} /> Sort by: Top Voted
                 </button>
               </div>
@@ -524,10 +572,10 @@ const Dashboard = ({ user }: { user: any }) => {
                 <AnimatePresence>
                   {feedbackList === undefined ? (
                     <div className="text-center py-12">
-                      <div className="animate-spin rounded-full h-8 w-8 border-4 border-zinc-200 border-t-zinc-900 mx-auto"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
                     </div>
                   ) : filteredItems.length === 0 ? (
-                    <div className="py-20 text-center text-zinc-400">
+                    <div className="py-20 text-center text-neutral-500">
                       <p>No posts found matching your criteria.</p>
                     </div>
                   ) : (
@@ -535,7 +583,7 @@ const Dashboard = ({ user }: { user: any }) => {
                       <FeedbackCard
                         key={item._id}
                         item={item}
-                        hasVoted={votedItems.has(item._id)}
+                        hasVoted={votedFeedbackItems.has(item._id)}
                         onVote={() => handleVote(item._id)}
                       />
                     ))

@@ -45,7 +45,7 @@ export const seedRoadmap = internalMutation({
       {
         title: "API Rate Limiting Improvements",
         description: "Enhanced performance and reliability for high-traffic applications",
-        status: "completed",
+        status: "live",
         quarter: "Q1 2024",
         category: "Performance",
         votes: 24,

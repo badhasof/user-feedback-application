@@ -8,7 +8,17 @@ export default function App() {
   return (
     <>
       <Content />
-      <Toaster position="top-right" />
+      <Toaster
+        position="top-right"
+        theme="dark"
+        toastOptions={{
+          style: {
+            background: '#161616',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            color: '#f4f4f5',
+          },
+        }}
+      />
     </>
   );
 }
@@ -18,8 +28,8 @@ function Content() {
 
   if (loggedInUser === undefined) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-indigo-200 border-t-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-neutral-700 border-t-blue-500"></div>
       </div>
     );
   }
