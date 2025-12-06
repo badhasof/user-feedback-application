@@ -11,7 +11,8 @@ import {
   LogOut,
   LayoutGrid,
   List,
-  ArrowUpDown
+  ArrowUpDown,
+  MoreHorizontal
 } from 'lucide-react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -37,13 +38,14 @@ const COLUMNS = [
 // --- Components ---
 
 const StatusBadge = ({ status }: { status: string }) => {
+  // Matching TaskCard's pill/badge styling
   const styles: Record<string, string> = {
-    'new': 'bg-neutral-800 text-neutral-400 border-neutral-700',
-    'under-review': 'bg-neutral-800 text-neutral-400 border-neutral-700',
-    'planned': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    'in-progress': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-    'resolved': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
-    'live': 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    'new': 'bg-neutral-800 text-neutral-400 border border-neutral-700',
+    'under-review': 'bg-neutral-800 text-neutral-400 border border-neutral-700',
+    'planned': 'bg-[#1e2738] text-[#60a5fa] border border-[#2b3a55]',
+    'in-progress': 'bg-[#352a15] text-[#fbbf24] border border-[#453616]',
+    'resolved': 'bg-[#192b23] text-[#4ade80] border border-[#223d2e]',
+    'live': 'bg-[#192b23] text-[#4ade80] border border-[#223d2e]',
   };
 
   const labels: Record<string, string> = {
@@ -56,7 +58,7 @@ const StatusBadge = ({ status }: { status: string }) => {
   };
 
   return (
-    <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full border ${styles[status] || styles['new']}`}>
+    <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", styles[status] || styles['new'])}>
       {labels[status] || status}
     </span>
   );
@@ -65,10 +67,15 @@ const StatusBadge = ({ status }: { status: string }) => {
 const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boolean; onClick: (e: React.MouseEvent) => void }) => (
   <button
     onClick={onClick}
-    className={`group flex flex-col items-center justify-center w-12 h-14 rounded-xl border transition-all duration-200 ${active ? 'bg-blue-500/20 border-blue-500/50 text-blue-400' : 'bg-[#1E1E1E] border-neutral-700 text-neutral-400 hover:border-neutral-600 hover:text-neutral-300'}`}
+    className={cn(
+      "group flex flex-col items-center justify-center w-14 h-14 rounded-lg border transition-colors",
+      active
+        ? "bg-[#1e2738] border-[#2b3a55] text-[#60a5fa]"
+        : "bg-[#161616] border-[#2E2E2E] text-neutral-500 hover:border-white/10 hover:text-neutral-300"
+    )}
   >
-    <ChevronUp size={18} className={`mb-1 transition-transform group-hover:-translate-y-0.5 ${active ? 'text-blue-400' : 'text-neutral-500'}`} />
-    <span className="text-xs font-bold">{votes}</span>
+    <ChevronUp size={18} className={cn("transition-transform group-hover:-translate-y-0.5", active ? "text-[#60a5fa]" : "")} />
+    <span className="text-[16px] font-semibold -mt-1.5">{votes}</span>
   </button>
 );
 
@@ -117,6 +124,7 @@ const FeedbackCard = ({ item, hasVoted, onVote }: { item: any; hasVoted: boolean
     }
   };
 
+  // Matching TaskCard tag styles
   const getCategoryStyle = (category?: string) => {
     if (category === "Feature") return "bg-[#1e2738] text-[#60a5fa] border border-[#2b3a55]";
     if (category === "Improvement") return "bg-[#192b23] text-[#4ade80] border border-[#223d2e]";
@@ -130,52 +138,72 @@ const FeedbackCard = ({ item, hasVoted, onVote }: { item: any; hasVoted: boolean
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-[#161616] rounded-2xl border border-white/5 hover:border-white/10 transition-all duration-300 group overflow-hidden"
+      className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden"
     >
-      <div className="flex gap-4 p-6 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+      <div className="flex gap-4 p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="hidden sm:block">
           <UpvoteButton votes={item.votes} active={hasVoted} onClick={(e) => { e.stopPropagation(); onVote(); }} />
         </div>
 
-        <div className="flex-1 space-y-2">
-          <div className="flex items-start justify-between">
-            <div className="space-y-1">
-              <h3 className="font-semibold text-neutral-100 group-hover:text-blue-400 transition-colors">{item.title}</h3>
-              <div className="flex items-center gap-2 sm:hidden">
-                <button
-                  onClick={(e) => { e.stopPropagation(); onVote(); }}
-                  className="text-xs font-bold text-neutral-500 flex items-center gap-1 hover:text-neutral-300"
-                >
-                  <ChevronUp size={12} className={hasVoted ? 'fill-current text-blue-400' : ''} /> {item.votes}
-                </button>
-                <span className="text-neutral-700">|</span>
-                <StatusBadge status={item.status} />
-              </div>
-            </div>
-            <div className="hidden sm:flex items-center gap-2">
+        <div className="flex-1 flex flex-col gap-1">
+          {/* Title row with tags */}
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="text-[19px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mt-0.5">
+              {item.title}
+            </h3>
+            <div className="hidden sm:flex items-center gap-2 shrink-0">
               {item.category && (
-                <span className={cn("text-[10px] font-medium px-2 py-0.5 rounded-md", getCategoryStyle(item.category))}>
+                <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
                   {item.category}
                 </span>
               )}
               <StatusBadge status={item.status} />
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
+              >
+                <MoreHorizontal size={16} />
+              </button>
             </div>
           </div>
 
-          <p className="text-sm text-neutral-400 leading-relaxed line-clamp-2">{item.description}</p>
+          {/* Mobile tags & vote */}
+          <div className="flex items-center gap-2 sm:hidden">
+            {item.category && (
+              <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
+                {item.category}
+              </span>
+            )}
+            <StatusBadge status={item.status} />
+            <button
+              onClick={(e) => { e.stopPropagation(); onVote(); }}
+              className="text-[11px] font-semibold text-neutral-500 flex items-center gap-1 hover:text-neutral-300 ml-auto"
+            >
+              <ChevronUp size={12} className={hasVoted ? 'text-blue-400' : ''} /> {item.votes}
+            </button>
+          </div>
 
-          <div className="flex items-center gap-4 pt-2 text-xs text-neutral-500 font-medium">
-            <div className="flex items-center gap-2">
-              <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-neutral-700 to-neutral-600 flex items-center justify-center text-[8px] text-neutral-300 font-bold">
+          {/* Description */}
+          <p className="text-[16px] text-neutral-500 leading-relaxed line-clamp-2">{item.description}</p>
+
+          {/* Separator */}
+          <div className="border-t border-[#2E2E2E] mt-5"></div>
+
+          {/* Footer meta */}
+          <div className="flex items-center gap-3 text-[11px] text-neutral-500 mt-3">
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
                 {item.isAnonymous ? '?' : 'U'}
               </div>
-              <span>{item.isAnonymous ? 'Anonymous' : 'User'}</span>
+              <span className="font-medium">{item.isAnonymous ? 'Anonymous' : 'User'}</span>
             </div>
-            <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
-              <MessageSquare size={12} />
-              <span>{commentCount || 0} comments</span>
-            </button>
+            <span className="text-neutral-600">·</span>
             <span>{formatDate(item._creationTime)}</span>
+            <span className="text-neutral-600">·</span>
+            <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
+              <MessageSquare size={11} />
+              <span>{commentCount || 0}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -185,33 +213,33 @@ const FeedbackCard = ({ item, hasVoted, onVote }: { item: any; hasVoted: boolean
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
-          className="border-t border-white/5 px-6 pb-6"
+          className="border-t border-[#2E2E2E] px-4 pb-4"
         >
           <div className="pt-4 space-y-4">
             <div>
-              <p className="text-sm text-neutral-300 leading-relaxed">{item.description}</p>
+              <p className="text-[13px] text-neutral-300 leading-relaxed">{item.description}</p>
             </div>
 
             <div className="space-y-3">
-              <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">Comments</h4>
+              <h4 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Comments</h4>
 
               {comments === undefined ? (
                 <div className="text-center py-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-2 border-neutral-700 border-t-neutral-400 mx-auto"></div>
                 </div>
               ) : comments.length === 0 ? (
-                <p className="text-xs text-neutral-600 py-2">No comments yet. Be the first to comment!</p>
+                <p className="text-[11px] text-neutral-600 py-2">No comments yet. Be the first to comment!</p>
               ) : (
                 comments.map((comment) => (
-                  <div key={comment._id} className="bg-[#1E1E1E] rounded-lg p-3 space-y-2 border border-white/5">
+                  <div key={comment._id} className="bg-[#161616] rounded-lg p-3 space-y-2 border border-[#2E2E2E]">
                     <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-neutral-600 to-neutral-500 flex items-center justify-center text-[7px] text-neutral-300 font-bold">
+                      <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
                         {comment.isAnonymous ? '?' : comment.userName?.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-xs font-medium text-neutral-300">{comment.userName}</span>
+                      <span className="text-[11px] font-medium text-neutral-300">{comment.userName}</span>
                       <span className="text-[10px] text-neutral-600">{formatDate(comment._creationTime)}</span>
                     </div>
-                    <p className="text-xs text-neutral-400 leading-relaxed">{comment.content}</p>
+                    <p className="text-[11px] text-neutral-400 leading-relaxed">{comment.content}</p>
                   </div>
                 ))
               )}
@@ -223,12 +251,12 @@ const FeedbackCard = ({ item, hasVoted, onVote }: { item: any; hasVoted: boolean
                   onChange={(e) => setNewComment(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
                   placeholder="Add a comment..."
-                  className="flex-1 px-3 py-2 text-sm bg-[#1E1E1E] border border-white/10 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 text-neutral-200 placeholder:text-neutral-600"
+                  className="flex-1 px-3 py-2 text-[13px] bg-[#161616] border border-[#2E2E2E] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 text-neutral-200 placeholder:text-neutral-600"
                   onClick={(e) => e.stopPropagation()}
                 />
                 <button
                   onClick={(e) => { e.stopPropagation(); handleAddComment(); }}
-                  className="px-4 py-2 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-500 transition-colors"
+                  className="px-4 py-2 bg-blue-600 text-white text-[11px] font-medium rounded-lg hover:bg-blue-500 transition-colors"
                 >
                   Post
                 </button>
