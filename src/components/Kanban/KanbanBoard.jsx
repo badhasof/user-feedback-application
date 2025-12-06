@@ -2,7 +2,8 @@ import { useState, useCallback, useRef } from "react";
 import {
   DndContext,
   DragOverlay,
-  closestCorners,
+  pointerWithin,
+  rectIntersection,
   useSensor,
   useSensors,
   PointerSensor,
@@ -11,6 +12,17 @@ import {
 import { sortableKeyboardCoordinates, arrayMove } from "@dnd-kit/sortable";
 import { KanbanColumn } from "./KanbanColumn";
 import { TaskCard } from "./TaskCard";
+
+// Custom collision detection that handles empty columns
+// pointerWithin detects when pointer is inside any droppable (even empty ones)
+// Falls back to rectIntersection for edge cases
+function customCollisionDetection(args) {
+  const pointerCollisions = pointerWithin(args);
+  if (pointerCollisions.length > 0) {
+    return pointerCollisions;
+  }
+  return rectIntersection(args);
+}
 
 export function KanbanBoard({ tasks, setTasks, columns }) {
   const [activeTask, setActiveTask] = useState(null);
@@ -123,7 +135,7 @@ export function KanbanBoard({ tasks, setTasks, columns }) {
     <div className="flex h-full gap-4 overflow-x-auto pb-4 items-start">
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={customCollisionDetection}
         onDragStart={onDragStart}
         onDragOver={onDragOver}
         onDragEnd={onDragEnd}
