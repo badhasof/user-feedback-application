@@ -79,7 +79,7 @@ const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boole
   </button>
 );
 
-const FeedbackCard = ({ item, hasVoted, onVote }: { item: any; hasVoted: boolean; onVote: () => void }) => {
+const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any; hasVoted: boolean; onVote: () => void; viewMode?: 'list' | 'grid' }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [newComment, setNewComment] = useState("");
   const addComment = useMutation(api.comments.addComment);
@@ -132,6 +132,81 @@ const FeedbackCard = ({ item, hasVoted, onVote }: { item: any; hasVoted: boolean
     return "bg-neutral-800 text-neutral-400 border border-neutral-700";
   };
 
+  // Grid view - compact vertical card
+  if (viewMode === 'grid') {
+    return (
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden flex flex-col"
+      >
+        <div className="p-4 flex flex-col flex-1 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+          {/* Header with tags and options */}
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              {item.category && (
+                <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
+                  {item.category}
+                </span>
+              )}
+              <StatusBadge status={item.status} />
+            </div>
+            <button
+              onClick={(e) => e.stopPropagation()}
+              className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
+            >
+              <MoreHorizontal size={16} />
+            </button>
+          </div>
+
+          {/* Title */}
+          <h3 className="text-[17px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mb-2">
+            {item.title}
+          </h3>
+
+          {/* Description */}
+          <p className="text-[14px] text-neutral-500 leading-relaxed line-clamp-3 flex-1">{item.description}</p>
+
+          {/* Separator */}
+          <div className="border-t border-[#2E2E2E] mt-4"></div>
+
+          {/* Footer with vote and meta */}
+          <div className="flex items-center justify-between mt-3">
+            <button
+              onClick={(e) => { e.stopPropagation(); onVote(); }}
+              className={cn(
+                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors",
+                hasVoted
+                  ? "bg-[#1e2738] border-[#2b3a55] text-[#60a5fa]"
+                  : "bg-[#161616] border-[#2E2E2E] text-neutral-500 hover:border-white/10 hover:text-neutral-300"
+              )}
+            >
+              <ChevronUp size={14} />
+              <span className="text-[13px] font-semibold">{item.votes}</span>
+            </button>
+
+            <div className="flex items-center gap-2 text-[11px] text-neutral-500">
+              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
+                {item.isAnonymous ? '?' : 'U'}
+              </div>
+              <span className="font-medium">{item.isAnonymous ? 'Anon' : 'User'}</span>
+              <span className="text-neutral-600">·</span>
+              <span>{formatDate(item._creationTime)}</span>
+              <span className="text-neutral-600">·</span>
+              <span className="flex items-center gap-1">
+                <MessageSquare size={11} />
+                {commentCount || 0}
+              </span>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  // List view - horizontal layout with side upvote button
   return (
     <motion.div
       layout
@@ -386,6 +461,7 @@ const Dashboard = ({ user }: { user: any }) => {
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('board');
+  const [feedbackViewMode, setFeedbackViewMode] = useState<'list' | 'grid'>('list');
   const { signOut } = useAuthActions();
 
   // Database hooks
@@ -587,21 +663,51 @@ const Dashboard = ({ user }: { user: any }) => {
                 category={activeTab === 'bugs' ? 'Bug' : 'Feature'}
               />
 
-              <div className="flex justify-between items-center text-xs text-neutral-500 font-medium uppercase tracking-wider">
-                <span>{filteredItems.length} Posts</span>
-                <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
-                  <Filter size={12} /> Sort by: Top Voted
-                </button>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{filteredItems.length} Posts</span>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1 bg-[#1E1E1E] p-1 rounded-lg border border-white/5">
+                    <button
+                      onClick={() => setFeedbackViewMode('list')}
+                      className={cn(
+                        "p-1.5 rounded transition-all",
+                        feedbackViewMode === 'list'
+                          ? "bg-[#2C2C2C] text-neutral-100 shadow-sm"
+                          : "text-neutral-500 hover:text-neutral-300"
+                      )}
+                    >
+                      <List size={16} />
+                    </button>
+                    <button
+                      onClick={() => setFeedbackViewMode('grid')}
+                      className={cn(
+                        "p-1.5 rounded transition-all",
+                        feedbackViewMode === 'grid'
+                          ? "bg-[#2C2C2C] text-neutral-100 shadow-sm"
+                          : "text-neutral-500 hover:text-neutral-300"
+                      )}
+                    >
+                      <LayoutGrid size={16} />
+                    </button>
+                  </div>
+                  <button className="flex items-center gap-1 text-xs text-neutral-500 font-medium uppercase tracking-wider hover:text-neutral-300 transition-colors">
+                    <Filter size={12} /> Sort by: Top Voted
+                  </button>
+                </div>
               </div>
 
-              <motion.div layout className="space-y-4">
+              <motion.div layout className={cn(
+                feedbackViewMode === 'grid'
+                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+                  : "space-y-4"
+              )}>
                 <AnimatePresence>
                   {feedbackList === undefined ? (
-                    <div className="text-center py-12">
+                    <div className={cn("text-center py-12", feedbackViewMode === 'grid' && "col-span-full")}>
                       <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
                     </div>
                   ) : filteredItems.length === 0 ? (
-                    <div className="py-20 text-center text-neutral-500">
+                    <div className={cn("py-20 text-center text-neutral-500", feedbackViewMode === 'grid' && "col-span-full")}>
                       <p>No posts found matching your criteria.</p>
                     </div>
                   ) : (
@@ -611,6 +717,7 @@ const Dashboard = ({ user }: { user: any }) => {
                         item={item}
                         hasVoted={votedFeedbackItems.has(item._id)}
                         onVote={() => handleVote(item._id)}
+                        viewMode={feedbackViewMode}
                       />
                     ))
                   )}
