@@ -22,6 +22,13 @@ import { useAuthActions } from "@convex-dev/auth/react";
 import { KanbanBoard, ListView } from "./Kanban";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { FeedbackDialog } from "./FeedbackDialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "./ui/sheet";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -82,12 +89,12 @@ const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boole
 );
 
 const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any; hasVoted: boolean; onVote: () => void; viewMode?: 'list' | 'grid' }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const addComment = useMutation(api.comments.addComment);
   const comments = useQuery(
     api.comments.listComments,
-    isExpanded ? { itemId: item._id, itemType: "feedback" } : "skip"
+    isSheetOpen ? { itemId: item._id, itemType: "feedback" } : "skip"
   );
   const commentCount = useQuery(api.comments.getCommentCount, {
     itemId: item._id,
@@ -134,213 +141,227 @@ const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any
     return "bg-neutral-800 text-neutral-400 border border-neutral-700";
   };
 
+  // Sheet content (shared between views)
+  const sheetContent = (
+    <SheetContent className="bg-[#161616] border-l-[#2E2E2E]">
+      <SheetHeader>
+        <div className="flex items-center gap-2 mb-2">
+          {item.category && (
+            <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
+              {item.category}
+            </span>
+          )}
+          <StatusBadge status={item.status} />
+        </div>
+        <SheetTitle className="text-xl font-normal text-neutral-100">{item.title}</SheetTitle>
+        <SheetDescription className="text-neutral-500">
+          {item.isAnonymous ? 'Anonymous' : 'User'} · {formatDate(item._creationTime)}
+        </SheetDescription>
+      </SheetHeader>
+
+      <div className="mt-6 space-y-6">
+        <p className="text-[15px] text-neutral-300 leading-relaxed">{item.description}</p>
+
+        <div className="space-y-4">
+          <h4 className="text-[12px] font-semibold text-neutral-500 uppercase tracking-wider">Comments</h4>
+
+          {comments === undefined ? (
+            <div className="text-center py-4">
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-neutral-700 border-t-neutral-400 mx-auto"></div>
+            </div>
+          ) : comments.length === 0 ? (
+            <p className="text-[13px] text-neutral-600 py-2">No comments yet. Be the first to comment!</p>
+          ) : (
+            comments.map((comment) => (
+              <div key={comment._id} className="bg-[#1E1E1E] rounded-lg p-3 space-y-2 border border-[#2E2E2E]">
+                <div className="flex items-center gap-2">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[8px] text-white font-bold">
+                    {comment.isAnonymous ? '?' : comment.userName?.charAt(0).toUpperCase()}
+                  </div>
+                  <span className="text-[12px] font-medium text-neutral-300">{comment.userName}</span>
+                  <span className="text-[11px] text-neutral-600">{formatDate(comment._creationTime)}</span>
+                </div>
+                <p className="text-[13px] text-neutral-400 leading-relaxed">{comment.content}</p>
+              </div>
+            ))
+          )}
+
+          <div className="flex gap-2 pt-2">
+            <input
+              type="text"
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+              placeholder="Add a comment..."
+              className="flex-1 px-3 py-2.5 text-[14px] bg-[#1E1E1E] border border-[#2E2E2E] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 text-neutral-200 placeholder:text-neutral-600"
+            />
+            <button
+              onClick={handleAddComment}
+              className="px-4 py-2.5 bg-blue-600 text-white text-[13px] font-normal rounded-lg hover:bg-blue-500 transition-colors"
+            >
+              Post
+            </button>
+          </div>
+        </div>
+      </div>
+    </SheetContent>
+  );
+
   // Grid view - compact vertical card
   if (viewMode === 'grid') {
     return (
-      <motion.div
-        layout
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden flex flex-col"
-      >
-        <div className="p-4 flex flex-col flex-1 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-          {/* Header with tags and options */}
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              {item.category && (
-                <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
-                  {item.category}
-                </span>
-              )}
-              <StatusBadge status={item.status} />
-            </div>
-            <button
-              onClick={(e) => e.stopPropagation()}
-              className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
-            >
-              <MoreHorizontal size={16} />
-            </button>
-          </div>
-
-          {/* Title */}
-          <h3 className="text-[17px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mb-2">
-            {item.title}
-          </h3>
-
-          {/* Description */}
-          <p className="text-[14px] text-neutral-500 leading-relaxed line-clamp-3 flex-1">{item.description}</p>
-
-          {/* Separator */}
-          <div className="border-t border-[#2E2E2E] mt-4"></div>
-
-          {/* Footer with vote and meta */}
-          <div className="flex items-center justify-between mt-3">
-            <button
-              onClick={(e) => { e.stopPropagation(); onVote(); }}
-              className={cn(
-                "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors",
-                hasVoted
-                  ? "bg-[#1e2738] border-[#2b3a55] text-[#60a5fa]"
-                  : "bg-[#161616] border-[#2E2E2E] text-neutral-500 hover:border-white/10 hover:text-neutral-300"
-              )}
-            >
-              <ChevronUp size={14} />
-              <span className="text-[13px] font-semibold">{item.votes}</span>
-            </button>
-
-            <div className="flex items-center gap-2 text-[11px] text-neutral-500">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
-                {item.isAnonymous ? '?' : 'U'}
+      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+        <motion.div
+          layout
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden flex flex-col"
+        >
+          <div className="p-4 flex flex-col flex-1 cursor-pointer" onClick={() => setIsSheetOpen(true)}>
+            {/* Header with tags and options */}
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <div className="flex items-center gap-2 flex-wrap">
+                {item.category && (
+                  <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
+                    {item.category}
+                  </span>
+                )}
+                <StatusBadge status={item.status} />
               </div>
-              <span className="font-medium">{item.isAnonymous ? 'Anon' : 'User'}</span>
-              <span className="text-neutral-600">·</span>
-              <span>{formatDate(item._creationTime)}</span>
-              <span className="text-neutral-600">·</span>
-              <span className="flex items-center gap-1">
-                <MessageSquare size={11} />
-                {commentCount || 0}
-              </span>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
+              >
+                <MoreHorizontal size={16} />
+              </button>
+            </div>
+
+            {/* Title */}
+            <h3 className="text-[17px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mb-2">
+              {item.title}
+            </h3>
+
+            {/* Description */}
+            <p className="text-[14px] text-neutral-500 leading-relaxed line-clamp-3 flex-1">{item.description}</p>
+
+            {/* Separator */}
+            <div className="border-t border-[#2E2E2E] mt-4"></div>
+
+            {/* Footer with vote and meta */}
+            <div className="flex items-center justify-between mt-3">
+              <button
+                onClick={(e) => { e.stopPropagation(); onVote(); }}
+                className={cn(
+                  "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors",
+                  hasVoted
+                    ? "bg-[#1e2738] border-[#2b3a55] text-[#60a5fa]"
+                    : "bg-[#161616] border-[#2E2E2E] text-neutral-500 hover:border-white/10 hover:text-neutral-300"
+                )}
+              >
+                <ChevronUp size={14} />
+                <span className="text-[13px] font-semibold">{item.votes}</span>
+              </button>
+
+              <div className="flex items-center gap-2 text-[11px] text-neutral-500">
+                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
+                  {item.isAnonymous ? '?' : 'U'}
+                </div>
+                <span className="font-medium">{item.isAnonymous ? 'Anon' : 'User'}</span>
+                <span className="text-neutral-600">·</span>
+                <span>{formatDate(item._creationTime)}</span>
+                <span className="text-neutral-600">·</span>
+                <span className="flex items-center gap-1">
+                  <MessageSquare size={11} />
+                  {commentCount || 0}
+                </span>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+        {sheetContent}
+      </Sheet>
     );
   }
 
   // List view - horizontal layout with side upvote button
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden"
-    >
-      <div className="flex gap-3 sm:gap-4 p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
-        <UpvoteButton votes={item.votes} active={hasVoted} onClick={(e) => { e.stopPropagation(); onVote(); }} />
+    <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+      <motion.div
+        layout
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden"
+      >
+        <div className="flex gap-3 sm:gap-4 p-4 cursor-pointer" onClick={() => setIsSheetOpen(true)}>
+          <UpvoteButton votes={item.votes} active={hasVoted} onClick={(e) => { e.stopPropagation(); onVote(); }} />
 
-        <div className="flex-1 flex flex-col gap-1">
-          {/* Title row with tags */}
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="text-[19px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mt-0.5">
-              {item.title}
-            </h3>
-            <button
-              onClick={(e) => e.stopPropagation()}
-              className="sm:hidden p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
-            >
-              <MoreHorizontal size={16} />
-            </button>
-            <div className="hidden sm:flex items-center gap-2 shrink-0">
+          <div className="flex-1 flex flex-col gap-1">
+            {/* Title row with tags */}
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="text-[19px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mt-0.5">
+                {item.title}
+              </h3>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                className="sm:hidden p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
+              >
+                <MoreHorizontal size={16} />
+              </button>
+              <div className="hidden sm:flex items-center gap-2 shrink-0">
+                {item.category && (
+                  <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
+                    {item.category}
+                  </span>
+                )}
+                <StatusBadge status={item.status} />
+                <button
+                  onClick={(e) => e.stopPropagation()}
+                  className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
+                >
+                  <MoreHorizontal size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile tags */}
+            <div className="flex items-center gap-2 sm:hidden">
               {item.category && (
                 <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
                   {item.category}
                 </span>
               )}
               <StatusBadge status={item.status} />
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
-              >
-                <MoreHorizontal size={16} />
+            </div>
+
+            {/* Description */}
+            <p className="text-[16px] text-neutral-500 leading-relaxed line-clamp-2">{item.description}</p>
+
+            {/* Separator */}
+            <div className="border-t border-[#2E2E2E] mt-5"></div>
+
+            {/* Footer meta */}
+            <div className="flex items-center gap-3 text-[11px] text-neutral-500 mt-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
+                  {item.isAnonymous ? '?' : 'U'}
+                </div>
+                <span className="font-medium">{item.isAnonymous ? 'Anonymous' : 'User'}</span>
+              </div>
+              <span className="text-neutral-600">·</span>
+              <span>{formatDate(item._creationTime)}</span>
+              <span className="text-neutral-600">·</span>
+              <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
+                <MessageSquare size={11} />
+                <span>{commentCount || 0}</span>
               </button>
             </div>
           </div>
-
-          {/* Mobile tags */}
-          <div className="flex items-center gap-2 sm:hidden">
-            {item.category && (
-              <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
-                {item.category}
-              </span>
-            )}
-            <StatusBadge status={item.status} />
-          </div>
-
-          {/* Description */}
-          <p className="text-[16px] text-neutral-500 leading-relaxed line-clamp-2">{item.description}</p>
-
-          {/* Separator */}
-          <div className="border-t border-[#2E2E2E] mt-5"></div>
-
-          {/* Footer meta */}
-          <div className="flex items-center gap-3 text-[11px] text-neutral-500 mt-3">
-            <div className="flex items-center gap-1.5">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
-                {item.isAnonymous ? '?' : 'U'}
-              </div>
-              <span className="font-medium">{item.isAnonymous ? 'Anonymous' : 'User'}</span>
-            </div>
-            <span className="text-neutral-600">·</span>
-            <span>{formatDate(item._creationTime)}</span>
-            <span className="text-neutral-600">·</span>
-            <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
-              <MessageSquare size={11} />
-              <span>{commentCount || 0}</span>
-            </button>
-          </div>
         </div>
-      </div>
-
-      {isExpanded && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          className="border-t border-[#2E2E2E] px-4 pb-4"
-        >
-          <div className="pt-4 space-y-4">
-            <div>
-              <p className="text-[13px] text-neutral-300 leading-relaxed">{item.description}</p>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-[11px] font-semibold text-neutral-500 uppercase tracking-wider">Comments</h4>
-
-              {comments === undefined ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-6 w-6 border-2 border-neutral-700 border-t-neutral-400 mx-auto"></div>
-                </div>
-              ) : comments.length === 0 ? (
-                <p className="text-[11px] text-neutral-600 py-2">No comments yet. Be the first to comment!</p>
-              ) : (
-                comments.map((comment) => (
-                  <div key={comment._id} className="bg-[#161616] rounded-lg p-3 space-y-2 border border-[#2E2E2E]">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
-                        {comment.isAnonymous ? '?' : comment.userName?.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="text-[11px] font-medium text-neutral-300">{comment.userName}</span>
-                      <span className="text-[10px] text-neutral-600">{formatDate(comment._creationTime)}</span>
-                    </div>
-                    <p className="text-[11px] text-neutral-400 leading-relaxed">{comment.content}</p>
-                  </div>
-                ))
-              )}
-
-              <div className="flex gap-2 pt-2">
-                <input
-                  type="text"
-                  value={newComment}
-                  onChange={(e) => setNewComment(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
-                  placeholder="Add a comment..."
-                  className="flex-1 px-3 py-2 text-[13px] bg-[#161616] border border-[#2E2E2E] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 text-neutral-200 placeholder:text-neutral-600"
-                  onClick={(e) => e.stopPropagation()}
-                />
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleAddComment(); }}
-                  className="px-4 py-2 bg-blue-600 text-white text-[11px] font-medium rounded-lg hover:bg-blue-500 transition-colors"
-                >
-                  Post
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      )}
-    </motion.div>
+      </motion.div>
+      {sheetContent}
+    </Sheet>
   );
 };
 
