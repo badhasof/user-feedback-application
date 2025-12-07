@@ -29,6 +29,14 @@ import {
   SheetTitle,
   SheetDescription,
 } from "./ui/sheet";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -229,12 +237,30 @@ const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any
                 )}
                 <StatusBadge status={item.status} />
               </div>
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
-              >
-                <MoreHorizontal size={16} />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
+                  >
+                    <MoreHorizontal size={16} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]">
+                  <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                    Share
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                  <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             {/* Title */}
@@ -303,12 +329,30 @@ const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any
               <h3 className="text-[19px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mt-0.5">
                 {item.title}
               </h3>
-              <button
-                onClick={(e) => e.stopPropagation()}
-                className="sm:hidden p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
-              >
-                <MoreHorizontal size={16} />
-              </button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    onClick={(e) => e.stopPropagation()}
+                    className="sm:hidden p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
+                  >
+                    <MoreHorizontal size={16} />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]">
+                  <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                    Share
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                  <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
               <div className="hidden sm:flex items-center gap-2 shrink-0">
                 {item.category && (
                   <span className={cn("text-[11px] font-medium px-2 py-1 rounded-md", getCategoryStyle(item.category))}>
@@ -316,12 +360,30 @@ const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any
                   </span>
                 )}
                 <StatusBadge status={item.status} />
-                <button
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
-                >
-                  <MoreHorizontal size={16} />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      onClick={(e) => e.stopPropagation()}
+                      className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
+                    >
+                      <MoreHorizontal size={16} />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]">
+                    <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                    <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                      Share
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                    <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 
