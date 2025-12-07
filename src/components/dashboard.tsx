@@ -20,6 +20,7 @@ import { toast } from "sonner";
 import { getSessionId } from "../lib/session";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { KanbanBoard, ListView } from "./Kanban";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -414,53 +415,23 @@ const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, des
   );
 };
 
-// Kanban Header - copied from UI App.jsx
-const KanbanHeader = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
-  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 mb-6">
-    <div className="flex items-center gap-2 bg-[#1E1E1E] p-1 rounded-lg border border-white/5">
-      <button
-        onClick={() => setViewMode("list")}
-        className={cn(
-          "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded transition-all",
-          viewMode === "list"
-            ? "bg-[#2C2C2C] text-neutral-100 shadow-sm border border-white/5"
-            : "text-neutral-400 hover:text-neutral-200"
-        )}
-      >
-        <LayoutGrid size={16} />
-        Default view
-      </button>
-      <button
-        onClick={() => setViewMode("board")}
-        className={cn(
-          "flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded transition-all",
-          viewMode === "board"
-            ? "bg-[#2C2C2C] text-neutral-100 shadow-sm border border-white/5"
-            : "text-neutral-400 hover:text-neutral-200"
-        )}
-      >
-        <List size={16} className="rotate-90" />
-        Board
-      </button>
+// Kanban Header Actions - filter, sort, search, new button
+const KanbanHeaderActions = () => (
+  <div className="flex items-center gap-4 ml-auto">
+    <div className="flex items-center gap-3 text-neutral-400">
+      <button className="hover:text-neutral-200 transition-colors"><Filter size={18} /></button>
+      <button className="hover:text-neutral-200 transition-colors"><ArrowUpDown size={18} /></button>
+      <button className="hover:text-neutral-200 transition-colors"><Search size={18} /></button>
     </div>
-
-    <div className="flex items-center gap-4 ml-auto">
-      <div className="flex items-center gap-3 text-neutral-400">
-        <button className="hover:text-neutral-200 transition-colors"><Filter size={18} /></button>
-        <button className="hover:text-neutral-200 transition-colors"><ArrowUpDown size={18} /></button>
-        <button className="hover:text-neutral-200 transition-colors"><Search size={18} /></button>
-      </div>
-      <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20">
-        New <div className="h-4 w-px bg-blue-400/50 mx-1" /><Plus size={16} />
-      </button>
-    </div>
+    <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20">
+      New <div className="h-4 w-px bg-blue-400/50 mx-1" /><Plus size={16} />
+    </button>
   </div>
 );
 
 const Dashboard = ({ user }: { user: any }) => {
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState('board');
   const [feedbackViewMode, setFeedbackViewMode] = useState<'list' | 'grid'>('list');
   const { signOut } = useAuthActions();
 
@@ -645,14 +616,27 @@ const Dashboard = ({ user }: { user: any }) => {
                   <p className="text-sm text-neutral-600 mt-1">Check back later for updates on our plans</p>
                 </div>
               ) : (
-                <>
-                  <KanbanHeader viewMode={viewMode} setViewMode={setViewMode} />
-                  {viewMode === "board" ? (
+                <Tabs defaultValue="board" className="w-full">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 mb-6">
+                    <TabsList>
+                      <TabsTrigger value="board">
+                        <LayoutGrid size={16} />
+                        Board
+                      </TabsTrigger>
+                      <TabsTrigger value="list">
+                        <List size={16} />
+                        List View
+                      </TabsTrigger>
+                    </TabsList>
+                    <KanbanHeaderActions />
+                  </div>
+                  <TabsContent value="board">
                     <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} />
-                  ) : (
+                  </TabsContent>
+                  <TabsContent value="list">
                     <ListView tasks={tasks} columns={COLUMNS} />
-                  )}
-                </>
+                  </TabsContent>
+                </Tabs>
               )}
             </motion.div>
           ) : (
