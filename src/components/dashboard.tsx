@@ -432,7 +432,6 @@ const KanbanHeaderActions = () => (
 const Dashboard = ({ user }: { user: any }) => {
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');
-  const [feedbackViewMode, setFeedbackViewMode] = useState<'list' | 'grid'>('list');
   const { signOut } = useAuthActions();
 
   // Database hooks
@@ -640,74 +639,72 @@ const Dashboard = ({ user }: { user: any }) => {
               )}
             </motion.div>
           ) : (
-            // List View (Features & Bugs)
-            <div className="space-y-6">
-              <CreatePostInput
-                onSubmit={handleSubmitFeedback}
-                category={activeTab === 'bugs' ? 'Bug' : 'Feature'}
-              />
-
-              <div className="flex justify-between items-center">
-                <span className="text-xs text-neutral-500 font-medium uppercase tracking-wider">{filteredItems.length} Posts</span>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-1 bg-[#1E1E1E] p-1 rounded-lg border border-white/5">
-                    <button
-                      onClick={() => setFeedbackViewMode('list')}
-                      className={cn(
-                        "p-1.5 rounded transition-all",
-                        feedbackViewMode === 'list'
-                          ? "bg-[#2C2C2C] text-neutral-100 shadow-sm"
-                          : "text-neutral-500 hover:text-neutral-300"
-                      )}
-                    >
-                      <List size={16} />
-                    </button>
-                    <button
-                      onClick={() => setFeedbackViewMode('grid')}
-                      className={cn(
-                        "p-1.5 rounded transition-all",
-                        feedbackViewMode === 'grid'
-                          ? "bg-[#2C2C2C] text-neutral-100 shadow-sm"
-                          : "text-neutral-500 hover:text-neutral-300"
-                      )}
-                    >
-                      <LayoutGrid size={16} />
-                    </button>
-                  </div>
-                  <button className="flex items-center gap-1 text-xs text-neutral-500 font-medium uppercase tracking-wider hover:text-neutral-300 transition-colors">
-                    <Filter size={12} /> Sort by: Top Voted
-                  </button>
-                </div>
+            // Features & Bugs View
+            <Tabs defaultValue="board" className="w-full">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 mb-6">
+                <TabsList>
+                  <TabsTrigger value="board">
+                    <LayoutGrid size={16} />
+                    Board
+                  </TabsTrigger>
+                  <TabsTrigger value="list">
+                    <List size={16} />
+                    List View
+                  </TabsTrigger>
+                </TabsList>
+                <KanbanHeaderActions />
               </div>
-
-              <motion.div layout className={cn(
-                feedbackViewMode === 'grid'
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-                  : "space-y-4"
-              )}>
-                <AnimatePresence>
-                  {feedbackList === undefined ? (
-                    <div className={cn("text-center py-12", feedbackViewMode === 'grid' && "col-span-full")}>
-                      <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
-                    </div>
-                  ) : filteredItems.length === 0 ? (
-                    <div className={cn("py-20 text-center text-neutral-500", feedbackViewMode === 'grid' && "col-span-full")}>
-                      <p>No posts found matching your criteria.</p>
-                    </div>
-                  ) : (
-                    filteredItems.map((item) => (
-                      <FeedbackCard
-                        key={item._id}
-                        item={item}
-                        hasVoted={votedFeedbackItems.has(item._id)}
-                        onVote={() => handleVote(item._id)}
-                        viewMode={feedbackViewMode}
-                      />
-                    ))
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            </div>
+              <TabsContent value="board">
+                <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <AnimatePresence>
+                    {feedbackList === undefined ? (
+                      <div className="text-center py-12 col-span-full">
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                      </div>
+                    ) : filteredItems.length === 0 ? (
+                      <div className="py-20 text-center text-neutral-500 col-span-full">
+                        <p>No posts found matching your criteria.</p>
+                      </div>
+                    ) : (
+                      filteredItems.map((item) => (
+                        <FeedbackCard
+                          key={item._id}
+                          item={item}
+                          hasVoted={votedFeedbackItems.has(item._id)}
+                          onVote={() => handleVote(item._id)}
+                          viewMode="grid"
+                        />
+                      ))
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </TabsContent>
+              <TabsContent value="list">
+                <motion.div layout className="space-y-4">
+                  <AnimatePresence>
+                    {feedbackList === undefined ? (
+                      <div className="text-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                      </div>
+                    ) : filteredItems.length === 0 ? (
+                      <div className="py-20 text-center text-neutral-500">
+                        <p>No posts found matching your criteria.</p>
+                      </div>
+                    ) : (
+                      filteredItems.map((item) => (
+                        <FeedbackCard
+                          key={item._id}
+                          item={item}
+                          hasVoted={votedFeedbackItems.has(item._id)}
+                          onVote={() => handleVote(item._id)}
+                          viewMode="list"
+                        />
+                      ))
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              </TabsContent>
+            </Tabs>
           )}
         </div>
 
