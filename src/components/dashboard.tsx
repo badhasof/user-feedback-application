@@ -21,6 +21,7 @@ import { getSessionId } from "../lib/session";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { KanbanBoard, ListView } from "./Kanban";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
+import { FeedbackDialog } from "./FeedbackDialog";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -416,16 +417,14 @@ const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, des
 };
 
 // Kanban Header Actions - filter, sort, search, new button
-const KanbanHeaderActions = () => (
+const KanbanHeaderActions = ({ defaultCategory }: { defaultCategory?: "Bug" | "Feature" | "Improvement" | "Other" }) => (
   <div className="flex items-center gap-4 ml-auto">
     <div className="flex items-center gap-3 text-neutral-400">
       <button className="hover:text-neutral-200 transition-colors"><Filter size={18} /></button>
       <button className="hover:text-neutral-200 transition-colors"><ArrowUpDown size={18} /></button>
       <button className="hover:text-neutral-200 transition-colors"><Search size={18} /></button>
     </div>
-    <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20">
-      New <div className="h-4 w-px bg-blue-400/50 mx-1" /><Plus size={16} />
-    </button>
+    <FeedbackDialog defaultCategory={defaultCategory} />
   </div>
 );
 
@@ -627,7 +626,7 @@ const Dashboard = ({ user }: { user: any }) => {
                         List View
                       </TabsTrigger>
                     </TabsList>
-                    <KanbanHeaderActions />
+                    <KanbanHeaderActions defaultCategory={activeTab === 'bugs' ? 'Bug' : 'Feature'} />
                   </div>
                   <TabsContent value="board">
                     <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} />
@@ -652,7 +651,7 @@ const Dashboard = ({ user }: { user: any }) => {
                     List View
                   </TabsTrigger>
                 </TabsList>
-                <KanbanHeaderActions />
+                <KanbanHeaderActions defaultCategory={activeTab === 'bugs' ? 'Bug' : 'Feature'} />
               </div>
               <TabsContent value="board">
                 <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
