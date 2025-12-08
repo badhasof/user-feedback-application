@@ -5,6 +5,9 @@
 :root {
   --color-light: #09090b;
   --color-dark: #f4f4f5;
+  --border: 0 0% 14%;
+  --background: 0 0% 4%;
+  --foreground: 240 5% 96%;
 }
 
 .accent-text {
@@ -70,4 +73,41 @@ body {
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+
+
+@layer base {
+  :root {
+    /* Dark theme sidebar by default (matching the app's dark theme) */
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 240 5% 96%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 240 5% 96%;
+    --sidebar-border: 0 0% 14%;
+    --sidebar-ring: 217 91% 60%;
+  }
+  .dark {
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 240 5% 96%;
+    --sidebar-primary: 217 91% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 240 5% 96%;
+    --sidebar-border: 0 0% 14%;
+    --sidebar-ring: 217 91% 60%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }

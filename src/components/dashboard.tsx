@@ -8,7 +8,6 @@ import {
   Plus,
   CornerDownRight,
   X,
-  LogOut,
   LayoutGrid,
   List,
   ArrowUpDown,
@@ -19,7 +18,6 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { toast } from "sonner";
 import { getSessionId } from "../lib/session";
-import { useAuthActions } from "@convex-dev/auth/react";
 import { KanbanBoard, ListView } from "./Kanban";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { FeedbackDialog } from "./FeedbackDialog";
@@ -561,7 +559,6 @@ const Dashboard = ({ user }: { user: any }) => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [feedbackToDelete, setFeedbackToDelete] = useState<FeedbackItem | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const { signOut } = useAuthActions();
 
   // Database hooks
   const submitFeedback = useMutation(api.feedback.submitFeedback);
@@ -743,37 +740,9 @@ const Dashboard = ({ user }: { user: any }) => {
   }, [moveTask]);
 
   return (
-    <div className="min-h-screen bg-[#09090b] font-sans text-neutral-200">
-      {/* Header Area */}
-      <header className="bg-[#0f0f10] border-b border-white/5 sticky top-0 z-20">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-lg shadow-blue-900/30">
-              <span className="font-bold text-sm tracking-tighter">Ac</span>
-            </div>
-            <div>
-              <h1 className="text-sm font-bold text-neutral-100 leading-none">Acme Feedback</h1>
-              <p className="text-[10px] text-neutral-500 font-medium mt-0.5">Public Roadmap & Request Board</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => signOut()}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-500 hover:bg-white/5 hover:text-neutral-300 transition-colors"
-            >
-              <LogOut size={14} /> Sign Out
-            </button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[10px] font-bold text-white ring-2 ring-[#09090b]">
-              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-            </div>
-          </div>
-        </div>
-      </header>
-
+    <div className="flex-1 bg-[#09090b] font-sans text-neutral-200 overflow-auto">
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 md:px-6 py-8 md:py-12">
-
+      <main className="p-6 md:p-8">
         {/* Hero / Intro */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
           <div className="space-y-2 max-w-lg">
