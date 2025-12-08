@@ -52,6 +52,18 @@ const applicationTables = {
   }).index("by_item", ["itemType", "itemId"])
     .index("by_user", ["userId", "itemType", "itemId"])
     .index("by_session", ["sessionId", "itemType", "itemId"]),
+
+  kanbanTasks: defineTable({
+    title: v.string(),
+    description: v.string(),
+    columnId: v.string(),
+    category: v.string(),
+    priority: v.string(),
+    order: v.number(),
+    sourceType: v.optional(v.string()),
+    sourceId: v.optional(v.string()),
+  }).index("by_column", ["columnId"])
+    .index("by_order", ["columnId", "order"]),
 };
 
 export default defineSchema({

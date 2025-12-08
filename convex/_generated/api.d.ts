@@ -13,6 +13,7 @@ import type * as comments from "../comments.js";
 import type * as featureRequests from "../featureRequests.js";
 import type * as feedback from "../feedback.js";
 import type * as http from "../http.js";
+import type * as kanban from "../kanban.js";
 import type * as roadmap from "../roadmap.js";
 import type * as router from "../router.js";
 import type * as seed from "../seed.js";
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   featureRequests: typeof featureRequests;
   feedback: typeof feedback;
   http: typeof http;
+  kanban: typeof kanban;
   roadmap: typeof roadmap;
   router: typeof router;
   seed: typeof seed;

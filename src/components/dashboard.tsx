@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
@@ -12,7 +12,8 @@ import {
   LayoutGrid,
   List,
   ArrowUpDown,
-  MoreHorizontal
+  MoreHorizontal,
+  Kanban
 } from 'lucide-react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -101,7 +102,7 @@ const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boole
   </button>
 );
 
-const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, viewMode = 'list' }: { item: any; hasVoted: boolean; onVote: () => void; onEdit: () => void; onDelete: () => void; viewMode?: 'list' | 'grid' }) => {
+const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban, viewMode = 'list' }: { item: any; hasVoted: boolean; onVote: () => void; onEdit: () => void; onDelete: () => void; onAddToKanban: () => void; viewMode?: 'list' | 'grid' }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const addComment = useMutation(api.comments.addComment);
@@ -260,8 +261,12 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, viewMode = 'li
                   >
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
-                    Share
+                  <DropdownMenuItem
+                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    onSelect={onAddToKanban}
+                  >
+                    <Kanban size={14} className="mr-2" />
+                    Add to Kanban
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
                   <DropdownMenuItem
@@ -358,8 +363,12 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, viewMode = 'li
                   >
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
-                    Share
+                  <DropdownMenuItem
+                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    onSelect={onAddToKanban}
+                  >
+                    <Kanban size={14} className="mr-2" />
+                    Add to Kanban
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
                   <DropdownMenuItem
@@ -395,8 +404,12 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, viewMode = 'li
                     >
                       Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
-                      Share
+                    <DropdownMenuItem
+                      className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                      onSelect={onAddToKanban}
+                    >
+                      <Kanban size={14} className="mr-2" />
+                      Add to Kanban
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-[#2E2E2E]" />
                     <DropdownMenuItem
@@ -563,6 +576,12 @@ const Dashboard = ({ user }: { user: any }) => {
     sessionId: getSessionId(),
   });
 
+  // Kanban hooks
+  const kanbanTasks = useQuery(api.kanban.listTasks, {});
+  const moveTask = useMutation(api.kanban.moveTask);
+  const addFeatureToKanban = useMutation(api.kanban.addFeatureToKanban);
+  const seedKanban = useMutation(api.kanban.seedKanbanTasks);
+
   const roadmapItems = useQuery(api.roadmap.listRoadmapItems, {});
 
   // Handle feedback submission
@@ -617,6 +636,32 @@ const Dashboard = ({ user }: { user: any }) => {
     }
   };
 
+  // Handle add to kanban
+  const handleAddToKanban = async (item: FeedbackItem) => {
+    try {
+      await addFeatureToKanban({
+        featureId: item._id,
+        featureTitle: item.title,
+        featureDescription: item.description,
+        featureCategory: item.category,
+      });
+      toast.success("Added to Kanban board!");
+    } catch (error: any) {
+      if (error.message?.includes("already on the Kanban")) {
+        toast.error("This item is already on the Kanban board");
+      } else {
+        toast.error("Failed to add to Kanban");
+      }
+    }
+  };
+
+  // Seed kanban on first load if empty
+  useEffect(() => {
+    if (kanbanTasks !== undefined && kanbanTasks.length === 0) {
+      seedKanban({});
+    }
+  }, [kanbanTasks, seedKanban]);
+
   // Get voted items set
   const votedFeedbackItems = new Set(
     userVotes?.filter((v) => v.itemType === "feedback").map((v) => v.itemId) || []
@@ -638,9 +683,8 @@ const Dashboard = ({ user }: { user: any }) => {
 
   const filteredItems = getFilteredItems();
 
-  // Transform roadmap items for Kanban - matching original UI pattern exactly
-  // useState with initial data, useEffect to sync when DB changes
-  const [tasks, setTasks] = useState<Array<{
+  // Transform kanban tasks for the board - using local state for smooth DnD
+  const [tasks, setTasksLocal] = useState<Array<{
     id: string;
     columnId: string;
     title: string;
@@ -649,21 +693,45 @@ const Dashboard = ({ user }: { user: any }) => {
     priority: "High" | "Medium" | "Low";
   }>>([]);
 
-  // Sync local state when roadmap items load/change from DB
+  // Sync local state when kanban tasks load/change from DB
   useEffect(() => {
-    if (roadmapItems) {
-      setTasks(roadmapItems.map(item => ({
-        id: item._id,
-        columnId: item.status === 'planned' ? 'not-started' :
-                  item.status === 'in-progress' ? 'in-progress' :
-                  item.status === 'live' ? 'completed' : 'no-status',
-        title: item.title,
-        desc: item.description || '',
-        tag: item.category || '',
-        priority: "High" as const,
+    if (kanbanTasks) {
+      setTasksLocal(kanbanTasks.map(task => ({
+        id: task._id,
+        columnId: task.columnId,
+        title: task.title,
+        desc: task.description || '',
+        tag: task.category || '',
+        priority: (task.priority as "High" | "Medium" | "Low") || "Medium",
       })));
     }
-  }, [roadmapItems]);
+  }, [kanbanTasks]);
+
+  // Custom setTasks that updates both local state and database
+  const setTasks = useCallback((updater: React.SetStateAction<typeof tasks>) => {
+    setTasksLocal(prevTasks => {
+      const newTasks = typeof updater === 'function' ? updater(prevTasks) : updater;
+
+      // Find moved task by comparing with previous state
+      newTasks.forEach((newTask, newIndex) => {
+        const oldTask = prevTasks.find(t => t.id === newTask.id);
+        if (oldTask && (oldTask.columnId !== newTask.columnId || prevTasks.indexOf(oldTask) !== newIndex)) {
+          // Task was moved - calculate new order within column
+          const tasksInColumn = newTasks.filter(t => t.columnId === newTask.columnId);
+          const orderInColumn = tasksInColumn.indexOf(newTask);
+
+          // Update database asynchronously
+          moveTask({
+            taskId: newTask.id as Id<"kanbanTasks">,
+            targetColumnId: newTask.columnId,
+            newOrder: orderInColumn,
+          }).catch(console.error);
+        }
+      });
+
+      return newTasks;
+    });
+  }, [moveTask]);
 
   return (
     <div className="min-h-screen bg-[#09090b] font-sans text-neutral-200">
@@ -748,11 +816,11 @@ const Dashboard = ({ user }: { user: any }) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
             >
-              {roadmapItems === undefined ? (
+              {kanbanTasks === undefined ? (
                 <div className="text-center py-12 w-full">
                   <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
                 </div>
-              ) : roadmapItems.length === 0 ? (
+              ) : tasks.length === 0 ? (
                 <div className="text-center py-16">
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#161616] flex items-center justify-center">
                     <LayoutGrid size={24} className="text-neutral-600" />
@@ -820,6 +888,7 @@ const Dashboard = ({ user }: { user: any }) => {
                           onVote={() => handleVote(item._id)}
                           onEdit={() => handleEdit(item as FeedbackItem)}
                           onDelete={() => handleDelete(item as FeedbackItem)}
+                          onAddToKanban={() => handleAddToKanban(item as FeedbackItem)}
                           viewMode="grid"
                         />
                       ))
@@ -847,6 +916,7 @@ const Dashboard = ({ user }: { user: any }) => {
                           onVote={() => handleVote(item._id)}
                           onEdit={() => handleEdit(item as FeedbackItem)}
                           onDelete={() => handleDelete(item as FeedbackItem)}
+                          onAddToKanban={() => handleAddToKanban(item as FeedbackItem)}
                           viewMode="list"
                         />
                       ))
