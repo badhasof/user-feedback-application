@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -6,6 +6,7 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { Plus, Bug, Lightbulb, Sparkles, HelpCircle, CornerDownRight } from "lucide-react";
+import { Id } from "../../convex/_generated/dataModel";
 
 import {
   Dialog,
@@ -36,13 +37,36 @@ const categories = [
   { value: "Other", label: "Other", icon: HelpCircle, color: "text-neutral-400", bg: "bg-neutral-500/10" },
 ] as const;
 
-interface FeedbackDialogProps {
-  defaultCategory?: "Bug" | "Feature" | "Improvement" | "Other";
+interface FeedbackToEdit {
+  _id: Id<"feedback">;
+  title: string;
+  description: string;
+  category: string;
+  isAnonymous: boolean;
 }
 
-export function FeedbackDialog({ defaultCategory = "Feature" }: FeedbackDialogProps) {
-  const [open, setOpen] = useState(false);
+interface FeedbackDialogProps {
+  defaultCategory?: "Bug" | "Feature" | "Improvement" | "Other";
+  feedbackToEdit?: FeedbackToEdit | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function FeedbackDialog({
+  defaultCategory = "Feature",
+  feedbackToEdit,
+  open: controlledOpen,
+  onOpenChange,
+}: FeedbackDialogProps) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled ? onOpenChange! : setInternalOpen;
+
+  const isEditMode = !!feedbackToEdit;
+
   const submitFeedback = useMutation(api.feedback.submitFeedback);
+  const updateFeedback = useMutation(api.feedback.updateFeedback);
 
   const form = useForm<FeedbackFormValues>({
     resolver: zodResolver(feedbackFormSchema),
@@ -54,20 +78,49 @@ export function FeedbackDialog({ defaultCategory = "Feature" }: FeedbackDialogPr
     },
   });
 
+  // Reset form with edit data when feedbackToEdit changes
+  useEffect(() => {
+    if (feedbackToEdit) {
+      form.reset({
+        title: feedbackToEdit.title,
+        description: feedbackToEdit.description,
+        category: feedbackToEdit.category as "Bug" | "Feature" | "Improvement" | "Other",
+        isAnonymous: feedbackToEdit.isAnonymous,
+      });
+    } else {
+      form.reset({
+        title: "",
+        description: "",
+        category: defaultCategory,
+        isAnonymous: false,
+      });
+    }
+  }, [feedbackToEdit, form, defaultCategory]);
+
   const onSubmit = async (data: FeedbackFormValues) => {
     try {
-      await submitFeedback({
-        title: data.title.trim(),
-        description: data.description.trim(),
-        category: data.category,
-        isAnonymous: data.isAnonymous,
-      });
+      if (isEditMode && feedbackToEdit) {
+        await updateFeedback({
+          feedbackId: feedbackToEdit._id,
+          title: data.title.trim(),
+          description: data.description.trim(),
+          category: data.category,
+        });
+        toast.success("Feedback updated successfully!");
+      } else {
+        await submitFeedback({
+          title: data.title.trim(),
+          description: data.description.trim(),
+          category: data.category,
+          isAnonymous: data.isAnonymous,
+        });
+        toast.success("Feedback submitted successfully!");
+      }
 
-      toast.success("Feedback submitted successfully!");
       form.reset();
       setOpen(false);
     } catch (error) {
-      toast.error("Failed to submit feedback. Please try again.");
+      toast.error(isEditMode ? "Failed to update feedback. Please try again." : "Failed to submit feedback. Please try again.");
     }
   };
 
@@ -76,18 +129,24 @@ export function FeedbackDialog({ defaultCategory = "Feature" }: FeedbackDialogPr
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20">
-          New <div className="h-4 w-px bg-blue-400/50 mx-1" />
-          <Plus size={16} />
-        </button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20">
+            New <div className="h-4 w-px bg-blue-400/50 mx-1" />
+            <Plus size={16} />
+          </button>
+        </DialogTrigger>
+      )}
       <DialogContent className="sm:max-w-[540px] bg-[#161616] border-white/5 p-0 gap-0 overflow-hidden">
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* Header */}
           <div className="px-8 pt-8 pb-5">
-            <h3 className="text-xl font-normal text-neutral-100 tracking-tight">Create a new post</h3>
-            <p className="text-[15px] text-neutral-500 mt-1.5 font-normal">Share feedback, report bugs, or request features</p>
+            <h3 className="text-xl font-normal text-neutral-100 tracking-tight">
+              {isEditMode ? "Edit post" : "Create a new post"}
+            </h3>
+            <p className="text-[15px] text-neutral-500 mt-1.5 font-normal">
+              {isEditMode ? "Update your feedback details" : "Share feedback, report bugs, or request features"}
+            </p>
           </div>
 
           {/* Category Pills */}
@@ -151,14 +210,18 @@ export function FeedbackDialog({ defaultCategory = "Feature" }: FeedbackDialogPr
 
           {/* Footer */}
           <div className="px-8 py-5 mt-3 border-t border-white/5 flex items-center justify-between">
-            <label className="flex items-center gap-2.5 cursor-pointer">
-              <input
-                type="checkbox"
-                {...form.register("isAnonymous")}
-                className="w-4 h-4 rounded border-neutral-700 bg-[#1E1E1E] text-blue-600 focus:ring-0 focus:ring-offset-0"
-              />
-              <span className="text-sm text-neutral-500">Post anonymously</span>
-            </label>
+            {!isEditMode ? (
+              <label className="flex items-center gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  {...form.register("isAnonymous")}
+                  className="w-4 h-4 rounded border-neutral-700 bg-[#1E1E1E] text-blue-600 focus:ring-0 focus:ring-offset-0"
+                />
+                <span className="text-sm text-neutral-500">Post anonymously</span>
+              </label>
+            ) : (
+              <div />
+            )}
 
             <div className="flex gap-3">
               <button
@@ -173,7 +236,7 @@ export function FeedbackDialog({ defaultCategory = "Feature" }: FeedbackDialogPr
                 disabled={form.formState.isSubmitting}
                 className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-500 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
-                Submit <CornerDownRight size={16} />
+                {isEditMode ? "Update" : "Submit"} <CornerDownRight size={16} />
               </button>
             </div>
           </div>

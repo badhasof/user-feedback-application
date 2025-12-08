@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
+import { Id } from "../../convex/_generated/dataModel";
 import { toast } from "sonner";
 import { getSessionId } from "../lib/session";
 import { useAuthActions } from "@convex-dev/auth/react";
@@ -29,6 +30,10 @@ import {
   SheetTitle,
   SheetDescription,
 } from "./ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+} from "./ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -96,7 +101,7 @@ const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boole
   </button>
 );
 
-const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any; hasVoted: boolean; onVote: () => void; viewMode?: 'list' | 'grid' }) => {
+const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, viewMode = 'list' }: { item: any; hasVoted: boolean; onVote: () => void; onEdit: () => void; onDelete: () => void; viewMode?: 'list' | 'grid' }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const addComment = useMutation(api.comments.addComment);
@@ -246,17 +251,23 @@ const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any
                     <MoreHorizontal size={16} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]">
+                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]" onClick={(e) => e.stopPropagation()}>
                   <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
-                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                  <DropdownMenuItem
+                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    onSelect={onEdit}
+                  >
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
                     Share
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
-                  <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                  <DropdownMenuItem
+                    className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
+                    onSelect={onDelete}
+                  >
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -338,17 +349,23 @@ const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any
                     <MoreHorizontal size={16} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]">
+                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]" onClick={(e) => e.stopPropagation()}>
                   <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
-                  <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                  <DropdownMenuItem
+                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    onSelect={onEdit}
+                  >
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
                     Share
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
-                  <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                  <DropdownMenuItem
+                    className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
+                    onSelect={onDelete}
+                  >
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -369,17 +386,23 @@ const FeedbackCard = ({ item, hasVoted, onVote, viewMode = 'list' }: { item: any
                       <MoreHorizontal size={16} />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]">
+                  <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]" onClick={(e) => e.stopPropagation()}>
                     <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
                     <DropdownMenuSeparator className="bg-[#2E2E2E]" />
-                    <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
+                    <DropdownMenuItem
+                      className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                      onSelect={onEdit}
+                    >
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white">
                       Share
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-[#2E2E2E]" />
-                    <DropdownMenuItem className="text-red-400 focus:bg-red-500/10 focus:text-red-400">
+                    <DropdownMenuItem
+                      className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
+                      onSelect={onDelete}
+                    >
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -511,14 +534,30 @@ const KanbanHeaderActions = ({ defaultCategory }: { defaultCategory?: "Bug" | "F
   </div>
 );
 
+interface FeedbackItem {
+  _id: Id<"feedback">;
+  title: string;
+  description: string;
+  category: string;
+  status: string;
+  votes: number;
+  isAnonymous: boolean;
+  _creationTime: number;
+}
+
 const Dashboard = ({ user }: { user: any }) => {
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');
+  const [feedbackToEdit, setFeedbackToEdit] = useState<FeedbackItem | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [feedbackToDelete, setFeedbackToDelete] = useState<FeedbackItem | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const { signOut } = useAuthActions();
 
   // Database hooks
   const submitFeedback = useMutation(api.feedback.submitFeedback);
   const voteFeedback = useMutation(api.feedback.voteFeedback);
+  const deleteFeedback = useMutation(api.feedback.deleteFeedback);
   const feedbackList = useQuery(api.feedback.listFeedback, {});
   const userVotes = useQuery(api.feedback.getUserVotes, {
     sessionId: getSessionId(),
@@ -550,6 +589,31 @@ const Dashboard = ({ user }: { user: any }) => {
       });
     } catch (error) {
       toast.error("Failed to vote");
+    }
+  };
+
+  // Handle edit
+  const handleEdit = (item: FeedbackItem) => {
+    setFeedbackToEdit(item);
+    setIsEditDialogOpen(true);
+  };
+
+  // Handle delete - show confirmation dialog
+  const handleDelete = (item: FeedbackItem) => {
+    setFeedbackToDelete(item);
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Confirm delete
+  const confirmDelete = async () => {
+    if (!feedbackToDelete) return;
+    try {
+      await deleteFeedback({ feedbackId: feedbackToDelete._id });
+      toast.success("Feedback deleted successfully!");
+      setIsDeleteDialogOpen(false);
+      setFeedbackToDelete(null);
+    } catch (error) {
+      toast.error("Failed to delete feedback");
     }
   };
 
@@ -754,6 +818,8 @@ const Dashboard = ({ user }: { user: any }) => {
                           item={item}
                           hasVoted={votedFeedbackItems.has(item._id)}
                           onVote={() => handleVote(item._id)}
+                          onEdit={() => handleEdit(item as FeedbackItem)}
+                          onDelete={() => handleDelete(item as FeedbackItem)}
                           viewMode="grid"
                         />
                       ))
@@ -779,6 +845,8 @@ const Dashboard = ({ user }: { user: any }) => {
                           item={item}
                           hasVoted={votedFeedbackItems.has(item._id)}
                           onVote={() => handleVote(item._id)}
+                          onEdit={() => handleEdit(item as FeedbackItem)}
+                          onDelete={() => handleDelete(item as FeedbackItem)}
                           viewMode="list"
                         />
                       ))
@@ -790,6 +858,42 @@ const Dashboard = ({ user }: { user: any }) => {
           )}
         </div>
 
+        {/* Edit Feedback Dialog */}
+        <FeedbackDialog
+          feedbackToEdit={feedbackToEdit}
+          open={isEditDialogOpen}
+          onOpenChange={(open) => {
+            setIsEditDialogOpen(open);
+            if (!open) setFeedbackToEdit(null);
+          }}
+        />
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <DialogContent className="sm:max-w-[340px] bg-[#161616] border-white/5 p-0 gap-0">
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-neutral-100">Delete this post?</h3>
+              <p className="text-sm text-neutral-500 mt-2">This action cannot be undone.</p>
+            </div>
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/5">
+              <button
+                onClick={() => {
+                  setIsDeleteDialogOpen(false);
+                  setFeedbackToDelete(null);
+                }}
+                className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-300 font-medium transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-500 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );

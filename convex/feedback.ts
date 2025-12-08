@@ -107,7 +107,71 @@ export const getUserVotes = query({
       .query("votes")
       .withIndex("by_session", (q) => q.eq("sessionId", args.sessionId))
       .collect();
-    
+
     return votes.map((v) => ({ itemId: v.itemId, itemType: v.itemType }));
+  },
+});
+
+export const updateFeedback = mutation({
+  args: {
+    feedbackId: v.id("feedback"),
+    title: v.string(),
+    description: v.string(),
+    category: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const feedback = await ctx.db.get(args.feedbackId);
+    if (!feedback) {
+      throw new Error("Feedback not found");
+    }
+
+    await ctx.db.patch(args.feedbackId, {
+      title: args.title,
+      description: args.description,
+      category: args.category,
+    });
+
+    return args.feedbackId;
+  },
+});
+
+export const deleteFeedback = mutation({
+  args: {
+    feedbackId: v.id("feedback"),
+  },
+  handler: async (ctx, args) => {
+    const feedback = await ctx.db.get(args.feedbackId);
+    if (!feedback) {
+      throw new Error("Feedback not found");
+    }
+
+    // Delete associated votes
+    const votes = await ctx.db
+      .query("votes")
+      .withIndex("by_item", (q) =>
+        q.eq("itemType", "feedback").eq("itemId", args.feedbackId)
+      )
+      .collect();
+
+    for (const vote of votes) {
+      await ctx.db.delete(vote._id);
+    }
+
+    // Delete associated comments
+    const comments = await ctx.db
+      .query("comments")
+      .withIndex("by_item", (q) =>
+        q.eq("itemType", "feedback").eq("itemId", args.feedbackId)
+      )
+      .collect();
+
+    for (const comment of comments) {
+      await ctx.db.delete(comment._id);
+    }
+
+    // Delete the feedback
+    await ctx.db.delete(args.feedbackId);
+
+    return { success: true };
   },
 });
