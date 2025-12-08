@@ -1,15 +1,23 @@
 import { memo } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { FileText, CheckCircle2 } from "lucide-react";
+import { FileText, CheckCircle2, MoreHorizontal } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export const TaskCard = memo(function TaskCard({ task, column, isOverlay }) {
+export const TaskCard = memo(function TaskCard({ task, column, isOverlay, onRemoveFromKanban }) {
   const {
     setNodeRef,
     attributes,
@@ -77,9 +85,32 @@ export const TaskCard = memo(function TaskCard({ task, column, isOverlay }) {
       {/* Title & Icon */}
       <div className="flex items-start gap-2.5">
         {task.desc && <FileText size={16} className="text-neutral-500 mt-[3px] shrink-0" />}
-        <h3 className="text-[15px] leading-relaxed font-medium text-neutral-200">
+        <h3 className="text-[15px] leading-relaxed font-medium text-neutral-200 flex-1">
           {task.title}
         </h3>
+        {onRemoveFromKanban && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                onClick={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0 opacity-0 group-hover:opacity-100 data-[state=open]:opacity-100 data-[state=open]:text-neutral-300 data-[state=open]:bg-white/5"
+              >
+                <MoreHorizontal size={16} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]">
+              <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
+              <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+              <DropdownMenuItem
+                className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
+                onSelect={() => onRemoveFromKanban(task.id)}
+              >
+                Remove
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* Tags */}

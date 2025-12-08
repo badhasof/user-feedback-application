@@ -24,7 +24,7 @@ function customCollisionDetection(args) {
   return rectIntersection(args);
 }
 
-export function KanbanBoard({ tasks, setTasks, columns }) {
+export function KanbanBoard({ tasks, setTasks, columns, onRemoveFromKanban }) {
   const [activeTask, setActiveTask] = useState(null);
 
   // Throttle refs to prevent rapid state updates
@@ -146,6 +146,7 @@ export function KanbanBoard({ tasks, setTasks, columns }) {
               key={col.id}
               column={col}
               tasks={tasks.filter((task) => task.columnId === col.id)}
+              onRemoveFromKanban={onRemoveFromKanban}
             />
           ))}
         </div>

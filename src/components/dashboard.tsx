@@ -12,8 +12,7 @@ import {
   LayoutGrid,
   List,
   ArrowUpDown,
-  MoreHorizontal,
-  Kanban
+  MoreHorizontal
 } from 'lucide-react';
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
@@ -265,7 +264,6 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
                     className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
                     onSelect={onAddToKanban}
                   >
-                    <Kanban size={14} className="mr-2" />
                     Add to Kanban
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
@@ -367,7 +365,6 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
                     className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
                     onSelect={onAddToKanban}
                   >
-                    <Kanban size={14} className="mr-2" />
                     Add to Kanban
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-[#2E2E2E]" />
@@ -408,7 +405,6 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
                       className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
                       onSelect={onAddToKanban}
                     >
-                      <Kanban size={14} className="mr-2" />
                       Add to Kanban
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-[#2E2E2E]" />
@@ -580,6 +576,7 @@ const Dashboard = ({ user }: { user: any }) => {
   const kanbanTasks = useQuery(api.kanban.listTasks, {});
   const moveTask = useMutation(api.kanban.moveTask);
   const addFeatureToKanban = useMutation(api.kanban.addFeatureToKanban);
+  const removeFromKanban = useMutation(api.kanban.deleteTask);
   const seedKanban = useMutation(api.kanban.seedKanbanTasks);
 
   const roadmapItems = useQuery(api.roadmap.listRoadmapItems, {});
@@ -652,6 +649,18 @@ const Dashboard = ({ user }: { user: any }) => {
       } else {
         toast.error("Failed to add to Kanban");
       }
+    }
+  };
+
+  // Handle remove from kanban
+  const handleRemoveFromKanban = async (taskId: string) => {
+    try {
+      await removeFromKanban({
+        taskId: taskId as Id<"kanbanTasks">,
+      });
+      toast.success("Removed from Kanban board");
+    } catch (error) {
+      toast.error("Failed to remove from Kanban");
     }
   };
 
@@ -844,7 +853,7 @@ const Dashboard = ({ user }: { user: any }) => {
                     <KanbanHeaderActions defaultCategory={activeTab === 'bugs' ? 'Bug' : 'Feature'} />
                   </div>
                   <TabsContent value="board">
-                    <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} />
+                    <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} onRemoveFromKanban={handleRemoveFromKanban} />
                   </TabsContent>
                   <TabsContent value="list">
                     <ListView tasks={tasks} columns={COLUMNS} />

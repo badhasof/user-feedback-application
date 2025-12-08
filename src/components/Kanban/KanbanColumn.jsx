@@ -10,7 +10,7 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export const KanbanColumn = memo(function KanbanColumn({ column, tasks }) {
+export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemoveFromKanban }) {
   const { setNodeRef } = useDroppable({
     id: column.id,
     data: {
@@ -67,7 +67,7 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks }) {
       >
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} column={column} />
+            <TaskCard key={task.id} task={task} column={column} onRemoveFromKanban={onRemoveFromKanban} />
           ))}
         </SortableContext>
       </div>
