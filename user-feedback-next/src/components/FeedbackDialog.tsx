@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
+  DialogTitle,
 } from "./ui/dialog";
 
 // Form validation schema
@@ -143,9 +144,9 @@ export function FeedbackDialog({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* Header */}
           <div className="px-8 pt-8 pb-5">
-            <h3 className="text-xl font-normal text-neutral-100 tracking-tight">
+            <DialogTitle className="text-xl font-normal text-neutral-100 tracking-tight">
               {isEditMode ? "Edit post" : "Create a new post"}
-            </h3>
+            </DialogTitle>
             <p className="text-[15px] text-neutral-500 mt-1.5 font-normal">
               {isEditMode ? "Update your feedback details" : "Share feedback, report bugs, or request features"}
             </p>

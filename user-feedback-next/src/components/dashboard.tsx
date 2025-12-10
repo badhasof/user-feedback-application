@@ -33,6 +33,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogTitle,
 } from "./ui/dialog";
 import {
   DropdownMenu,
@@ -919,7 +920,7 @@ const Dashboard = ({ user }: { user: any }) => {
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
           <DialogContent className="sm:max-w-[340px] bg-[#161616] border-white/5 p-0 gap-0">
             <div className="p-6">
-              <h3 className="text-lg font-medium text-neutral-100">Delete this post?</h3>
+              <DialogTitle className="text-lg font-medium text-neutral-100">Delete this post?</DialogTitle>
               <p className="text-sm text-neutral-500 mt-2">This action cannot be undone.</p>
             </div>
             <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/5">
