@@ -4,11 +4,15 @@ import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { FeedbackCard } from "./FeedbackCard";
 import { getSessionId } from "../lib/session";
+import { useTeam } from "@/contexts/TeamContext";
 
 const categories = ["Bug", "Feature", "Improvement", "Other"];
 const statuses = ["all", "new", "in-progress", "resolved"];
 
 export function FeedbackTab({ user }: { user: any }) {
+  const { activeTeam } = useTeam();
+  const teamId = activeTeam?._id;
+
   const [showForm, setShowForm] = useState(false);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -18,17 +22,29 @@ export function FeedbackTab({ user }: { user: any }) {
   const [selectedStatus, setSelectedStatus] = useState("all");
 
   const submitFeedback = useMutation(api.feedback.submitFeedback);
-  const feedback = useQuery(api.feedback.listFeedback, {
-    category: selectedCategory,
-    status: selectedStatus,
-  });
-  const userVotes = useQuery(api.feedback.getUserVotes, {
-    sessionId: getSessionId(),
-  });
+  const feedback = useQuery(
+    api.feedback.listFeedback,
+    teamId
+      ? {
+          teamId,
+          category: selectedCategory,
+          status: selectedStatus,
+        }
+      : "skip"
+  );
+  const userVotes = useQuery(
+    api.feedback.getUserVotes,
+    teamId ? { teamId, sessionId: getSessionId() } : "skip"
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
+    if (!teamId) {
+      toast.error("No team selected");
+      return;
+    }
+
     if (!title.trim() || !description.trim()) {
       toast.error("Please fill in all fields");
       return;
@@ -36,12 +52,13 @@ export function FeedbackTab({ user }: { user: any }) {
 
     try {
       await submitFeedback({
+        teamId,
         title: title.trim(),
         description: description.trim(),
         category,
         isAnonymous,
       });
-      
+
       toast.success("Feedback submitted successfully!");
       setTitle("");
       setDescription("");
@@ -54,22 +71,39 @@ export function FeedbackTab({ user }: { user: any }) {
   };
 
   const votedItems = new Set(
-    userVotes?.filter((v) => v.itemType === "feedback").map((v) => v.itemId) || []
+    userVotes?.filter((v) => v.itemType === "feedback").map((v) => v.itemId) ||
+      []
   );
+
+  if (!teamId) {
+    return <div>Please select a team</div>;
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Share Your Feedback</h2>
+          <h2 className="text-2xl font-bold text-slate-900">
+            Share Your Feedback
+          </h2>
           <p className="text-slate-600 mt-1">Let us know what you think</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
           className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg flex items-center gap-2"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
           </svg>
           New Feedback
         </button>
@@ -155,7 +189,9 @@ export function FeedbackTab({ user }: { user: any }) {
 
       <div className="flex flex-wrap gap-3">
         <div className="flex gap-2">
-          <span className="text-sm font-semibold text-slate-700 self-center">Category:</span>
+          <span className="text-sm font-semibold text-slate-700 self-center">
+            Category:
+          </span>
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -171,7 +207,9 @@ export function FeedbackTab({ user }: { user: any }) {
         </div>
 
         <div className="flex gap-2">
-          <span className="text-sm font-semibold text-slate-700 self-center">Status:</span>
+          <span className="text-sm font-semibold text-slate-700 self-center">
+            Status:
+          </span>
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -179,7 +217,9 @@ export function FeedbackTab({ user }: { user: any }) {
           >
             {statuses.map((status) => (
               <option key={status} value={status}>
-                {status === "all" ? "All" : status.charAt(0).toUpperCase() + status.slice(1)}
+                {status === "all"
+                  ? "All"
+                  : status.charAt(0).toUpperCase() + status.slice(1)}
               </option>
             ))}
           </select>
@@ -193,8 +233,18 @@ export function FeedbackTab({ user }: { user: any }) {
           </div>
         ) : feedback.length === 0 ? (
           <div className="text-center py-12 text-slate-500">
-            <svg className="w-16 h-16 mx-auto mb-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            <svg
+              className="w-16 h-16 mx-auto mb-4 text-slate-300"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+              />
             </svg>
             <p className="text-lg font-medium">No feedback yet</p>
             <p className="text-sm mt-1">Be the first to share your thoughts!</p>
@@ -206,6 +256,7 @@ export function FeedbackTab({ user }: { user: any }) {
               item={item}
               hasVoted={votedItems.has(item._id)}
               itemType="feedback"
+              teamId={teamId}
             />
           ))
         )}

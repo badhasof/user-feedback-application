@@ -9,6 +9,7 @@ import { api } from "../../convex/_generated/api";
 import { toast } from "sonner";
 import { Plus, Bug, Lightbulb, Sparkles, HelpCircle, CornerDownRight } from "lucide-react";
 import { Id } from "../../convex/_generated/dataModel";
+import { useTeam } from "@/contexts/TeamContext";
 
 import {
   Dialog,
@@ -28,7 +29,7 @@ const feedbackFormSchema = z.object({
     .min(10, "Description must be at least 10 characters")
     .max(1000, "Description must be less than 1000 characters"),
   category: z.enum(["Bug", "Feature", "Improvement", "Other"]),
-  isAnonymous: z.boolean().default(false),
+  isAnonymous: z.boolean(),
 });
 
 type FeedbackFormValues = z.infer<typeof feedbackFormSchema>;
@@ -67,6 +68,8 @@ export function FeedbackDialog({
   const setOpen = isControlled ? onOpenChange! : setInternalOpen;
 
   const isEditMode = !!feedbackToEdit;
+  const { activeTeam } = useTeam();
+  const teamId = activeTeam?._id;
 
   const submitFeedback = useMutation(api.feedback.submitFeedback);
   const updateFeedback = useMutation(api.feedback.updateFeedback);
@@ -101,9 +104,15 @@ export function FeedbackDialog({
   }, [feedbackToEdit, form, defaultCategory]);
 
   const onSubmit = async (data: FeedbackFormValues) => {
+    if (!teamId) {
+      toast.error("No team selected");
+      return;
+    }
+
     try {
       if (isEditMode && feedbackToEdit) {
         await updateFeedback({
+          teamId,
           feedbackId: feedbackToEdit._id,
           title: data.title.trim(),
           description: data.description.trim(),
@@ -112,6 +121,7 @@ export function FeedbackDialog({
         toast.success("Feedback updated successfully!");
       } else {
         await submitFeedback({
+          teamId,
           title: data.title.trim(),
           description: data.description.trim(),
           category: data.category,
@@ -236,7 +246,7 @@ export function FeedbackDialog({
               </button>
               <button
                 type="submit"
-                disabled={form.formState.isSubmitting}
+                disabled={form.formState.isSubmitting || !teamId}
                 className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-500 transition-colors flex items-center gap-2 disabled:opacity-50"
               >
                 {isEditMode ? "Update" : "Submit"} <CornerDownRight size={16} />

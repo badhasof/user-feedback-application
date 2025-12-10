@@ -29,20 +29,25 @@ export function FeedbackCard({
   item,
   hasVoted,
   itemType,
+  teamId,
 }: {
   item: any;
   hasVoted: boolean;
   itemType: "feedback" | "feature";
+  teamId: Id<"teams">;
 }) {
   const [showComments, setShowComments] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
 
   const voteMutation = useMutation(
-    itemType === "feedback" ? api.feedback.voteFeedback : api.featureRequests.voteFeatureRequest
+    itemType === "feedback"
+      ? api.feedback.voteFeedback
+      : api.featureRequests.voteFeatureRequest
   );
   const addComment = useMutation(api.comments.addComment);
   const comments = useQuery(api.comments.listComments, {
+    teamId,
     itemId: item._id,
     itemType,
   });
@@ -51,11 +56,13 @@ export function FeedbackCard({
     try {
       if (itemType === "feedback") {
         await voteMutation({
+          teamId,
           feedbackId: item._id as Id<"feedback">,
           sessionId: getSessionId(),
         });
       } else {
         await voteMutation({
+          teamId,
           requestId: item._id as Id<"featureRequests">,
           sessionId: getSessionId(),
         });
@@ -67,7 +74,7 @@ export function FeedbackCard({
 
   const handleAddComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!commentText.trim()) {
       toast.error("Please enter a comment");
       return;
@@ -75,12 +82,13 @@ export function FeedbackCard({
 
     try {
       await addComment({
+        teamId,
         itemId: item._id,
         itemType,
         content: commentText.trim(),
         isAnonymous,
       });
-      
+
       setCommentText("");
       setIsAnonymous(false);
       toast.success("Comment added!");
@@ -100,8 +108,18 @@ export function FeedbackCard({
               : "bg-slate-50 border-slate-200 text-slate-600 hover:border-indigo-300 hover:bg-indigo-50"
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 15l7-7 7 7"
+            />
           </svg>
           <span className="text-sm font-bold">{item.votes}</span>
         </button>
@@ -115,17 +133,22 @@ export function FeedbackCard({
           <div className="flex flex-wrap gap-2">
             <span
               className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                categoryColors[item.category as keyof typeof categoryColors] || categoryColors.Other
+                categoryColors[item.category as keyof typeof categoryColors] ||
+                categoryColors.Other
               }`}
             >
               {item.category}
             </span>
             <span
               className={`px-3 py-1 rounded-full text-xs font-semibold border ${
-                statusColors[item.status as keyof typeof statusColors] || statusColors.new
+                statusColors[item.status as keyof typeof statusColors] ||
+                statusColors.new
               }`}
             >
-              {item.status.split("-").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ")}
+              {item.status
+                .split("-")
+                .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+                .join(" ")}
             </span>
           </div>
 
@@ -133,8 +156,18 @@ export function FeedbackCard({
             onClick={() => setShowComments(!showComments)}
             className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
             </svg>
             {comments?.length || 0} Comments
           </button>
@@ -158,7 +191,10 @@ export function FeedbackCard({
                       onChange={(e) => setIsAnonymous(e.target.checked)}
                       className="w-4 h-4 text-indigo-600 border-slate-300 rounded focus:ring-indigo-500"
                     />
-                    <label htmlFor={`anon-${item._id}`} className="text-xs text-slate-600">
+                    <label
+                      htmlFor={`anon-${item._id}`}
+                      className="text-xs text-slate-600"
+                    >
                       Comment anonymously
                     </label>
                   </div>

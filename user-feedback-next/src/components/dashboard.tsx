@@ -20,6 +20,7 @@ import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { toast } from "sonner";
 import { getSessionId } from "../lib/session";
+import { useTeam } from "@/contexts/TeamContext";
 import { KanbanBoard, ListView } from "./Kanban";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { FeedbackDialog } from "./FeedbackDialog";
@@ -102,15 +103,16 @@ const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boole
   </button>
 );
 
-const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban, viewMode = 'list' }: { item: any; hasVoted: boolean; onVote: () => void; onEdit: () => void; onDelete: () => void; onAddToKanban: () => void; viewMode?: 'list' | 'grid' }) => {
+const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban, viewMode = 'list', teamId }: { item: any; hasVoted: boolean; onVote: () => void; onEdit: () => void; onDelete: () => void; onAddToKanban: () => void; viewMode?: 'list' | 'grid'; teamId: Id<"teams"> }) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [newComment, setNewComment] = useState("");
   const addComment = useMutation(api.comments.addComment);
   const comments = useQuery(
     api.comments.listComments,
-    isSheetOpen ? { itemId: item._id, itemType: "feedback" } : "skip"
+    isSheetOpen ? { teamId, itemId: item._id, itemType: "feedback" } : "skip"
   );
   const commentCount = useQuery(api.comments.getCommentCount, {
+    teamId,
     itemId: item._id,
     itemType: "feedback",
   });
@@ -135,6 +137,7 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
 
     try {
       await addComment({
+        teamId,
         itemId: item._id,
         itemType: "feedback",
         content: newComment,
@@ -556,6 +559,7 @@ interface FeedbackItem {
 }
 
 const Dashboard = ({ user }: { user: any }) => {
+  const { activeTeam } = useTeam();
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');
   const [feedbackToEdit, setFeedbackToEdit] = useState<FeedbackItem | null>(null);
@@ -563,28 +567,42 @@ const Dashboard = ({ user }: { user: any }) => {
   const [feedbackToDelete, setFeedbackToDelete] = useState<FeedbackItem | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
-  // Database hooks
+  // Get teamId from context
+  const teamId = activeTeam?._id;
+
+  // Database hooks - skip queries if no teamId
   const submitFeedback = useMutation(api.feedback.submitFeedback);
   const voteFeedback = useMutation(api.feedback.voteFeedback);
   const deleteFeedback = useMutation(api.feedback.deleteFeedback);
-  const feedbackList = useQuery(api.feedback.listFeedback, {});
-  const userVotes = useQuery(api.feedback.getUserVotes, {
-    sessionId: getSessionId(),
-  });
+  const feedbackList = useQuery(
+    api.feedback.listFeedback,
+    teamId ? { teamId } : "skip"
+  );
+  const userVotes = useQuery(
+    api.feedback.getUserVotes,
+    teamId ? { teamId, sessionId: getSessionId() } : "skip"
+  );
 
   // Kanban hooks
-  const kanbanTasks = useQuery(api.kanban.listTasks, {});
+  const kanbanTasks = useQuery(
+    api.kanban.listTasks,
+    teamId ? { teamId } : "skip"
+  );
   const moveTask = useMutation(api.kanban.moveTask);
   const addFeatureToKanban = useMutation(api.kanban.addFeatureToKanban);
   const removeFromKanban = useMutation(api.kanban.deleteTask);
-  const seedKanban = useMutation(api.kanban.seedKanbanTasks);
 
-  const roadmapItems = useQuery(api.roadmap.listRoadmapItems, {});
+  const roadmapItems = useQuery(
+    api.roadmap.listRoadmapItems,
+    teamId ? { teamId } : "skip"
+  );
 
   // Handle feedback submission
   const handleSubmitFeedback = async (title: string, description: string, category: string) => {
+    if (!teamId) return;
     try {
       await submitFeedback({
+        teamId,
         title,
         description,
         category,
@@ -598,8 +616,10 @@ const Dashboard = ({ user }: { user: any }) => {
 
   // Handle voting
   const handleVote = async (feedbackId: string) => {
+    if (!teamId) return;
     try {
       await voteFeedback({
+        teamId,
         feedbackId: feedbackId as any,
         sessionId: getSessionId(),
       });
@@ -622,9 +642,9 @@ const Dashboard = ({ user }: { user: any }) => {
 
   // Confirm delete
   const confirmDelete = async () => {
-    if (!feedbackToDelete) return;
+    if (!feedbackToDelete || !teamId) return;
     try {
-      await deleteFeedback({ feedbackId: feedbackToDelete._id });
+      await deleteFeedback({ teamId, feedbackId: feedbackToDelete._id });
       toast.success("Feedback deleted successfully!");
       setIsDeleteDialogOpen(false);
       setFeedbackToDelete(null);
@@ -635,8 +655,10 @@ const Dashboard = ({ user }: { user: any }) => {
 
   // Handle add to kanban
   const handleAddToKanban = async (item: FeedbackItem) => {
+    if (!teamId) return;
     try {
       await addFeatureToKanban({
+        teamId,
         featureId: item._id,
         featureTitle: item.title,
         featureDescription: item.description,
@@ -654,8 +676,10 @@ const Dashboard = ({ user }: { user: any }) => {
 
   // Handle remove from kanban
   const handleRemoveFromKanban = async (taskId: string) => {
+    if (!teamId) return;
     try {
       await removeFromKanban({
+        teamId,
         taskId: taskId as Id<"kanbanTasks">,
       });
       toast.success("Removed from Kanban board");
@@ -663,13 +687,6 @@ const Dashboard = ({ user }: { user: any }) => {
       toast.error("Failed to remove from Kanban");
     }
   };
-
-  // Seed kanban on first load if empty
-  useEffect(() => {
-    if (kanbanTasks !== undefined && kanbanTasks.length === 0) {
-      seedKanban({});
-    }
-  }, [kanbanTasks, seedKanban]);
 
   // Get voted items set
   const votedFeedbackItems = new Set(
@@ -718,6 +735,7 @@ const Dashboard = ({ user }: { user: any }) => {
 
   // Custom setTasks that updates both local state and database
   const setTasks = useCallback((updater: React.SetStateAction<typeof tasks>) => {
+    if (!teamId) return;
     setTasksLocal(prevTasks => {
       const newTasks = typeof updater === 'function' ? updater(prevTasks) : updater;
 
@@ -731,6 +749,7 @@ const Dashboard = ({ user }: { user: any }) => {
 
           // Update database asynchronously
           moveTask({
+            teamId,
             taskId: newTask.id as Id<"kanbanTasks">,
             targetColumnId: newTask.columnId,
             newOrder: orderInColumn,
@@ -740,7 +759,7 @@ const Dashboard = ({ user }: { user: any }) => {
 
       return newTasks;
     });
-  }, [moveTask]);
+  }, [moveTask, teamId]);
 
   return (
     <div className="flex-1 bg-[#09090b] font-sans text-neutral-200 overflow-auto">
@@ -868,6 +887,7 @@ const Dashboard = ({ user }: { user: any }) => {
                           onDelete={() => handleDelete(item as FeedbackItem)}
                           onAddToKanban={() => handleAddToKanban(item as FeedbackItem)}
                           viewMode="grid"
+                          teamId={teamId!}
                         />
                       ))
                     )}
@@ -896,6 +916,7 @@ const Dashboard = ({ user }: { user: any }) => {
                           onDelete={() => handleDelete(item as FeedbackItem)}
                           onAddToKanban={() => handleAddToKanban(item as FeedbackItem)}
                           viewMode="list"
+                          teamId={teamId!}
                         />
                       ))
                     )}
