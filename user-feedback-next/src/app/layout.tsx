@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "./globals.css";
+import "../index.css";
 import { ConvexAuthProvider } from "@/components/ConvexClientProvider";
 
 export const metadata: Metadata = {
