@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, memo } from "react";
+import { useMemo, memo, useState } from "react";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 import { TaskCard } from "./TaskCard";
+import { InlineTaskForm } from "./InlineTaskForm";
 import { CheckCircle2, MoreHorizontal, Plus } from "lucide-react";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -12,7 +13,9 @@ function cn(...inputs) {
   return twMerge(clsx(inputs));
 }
 
-export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemoveFromKanban }) {
+export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemoveFromKanban, onCreateTask }) {
+  const [isCreating, setIsCreating] = useState(false);
+
   const { setNodeRef } = useDroppable({
     id: column.id,
     data: {
@@ -30,6 +33,13 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemove
       case 'green': return "bg-[#166534] text-green-100";
       default: return "";
     }
+  };
+
+  const handleCreateTask = (taskData) => {
+    if (onCreateTask) {
+      onCreateTask(taskData);
+    }
+    setIsCreating(false);
   };
 
   return (
@@ -58,7 +68,12 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemove
         </div>
         <div className="flex gap-1 text-neutral-500">
           <button className="p-1 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"><MoreHorizontal size={18} /></button>
-          <button className="p-1 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"><Plus size={18} /></button>
+          <button
+            onClick={() => setIsCreating(true)}
+            className="p-1 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
+          >
+            <Plus size={18} />
+          </button>
         </div>
       </div>
 
@@ -67,6 +82,15 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemove
         ref={setNodeRef}
         className="flex-1 flex flex-col gap-2 min-h-[150px]"
       >
+        {/* Inline Create Form - appears at top */}
+        {isCreating && (
+          <InlineTaskForm
+            columnId={column.id}
+            onSubmit={handleCreateTask}
+            onCancel={() => setIsCreating(false)}
+          />
+        )}
+
         <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
           {tasks.map((task) => (
             <TaskCard key={task.id} task={task} column={column} onRemoveFromKanban={onRemoveFromKanban} />
@@ -75,7 +99,10 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemove
       </div>
 
       {/* New Task Button */}
-      <button className="group mt-3 flex items-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-neutral-700 hover:border-solid hover:bg-[#202020] hover:border-blue-500/50 transition-all text-left">
+      <button
+        onClick={() => setIsCreating(true)}
+        className="group mt-3 flex items-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-neutral-700 hover:border-solid hover:bg-[#202020] hover:border-blue-500/50 transition-all text-left"
+      >
         <Plus size={16} className="text-blue-500 group-hover:text-blue-400" />
         <span className="text-sm font-medium text-neutral-400 group-hover:text-neutral-300">New task</span>
       </button>

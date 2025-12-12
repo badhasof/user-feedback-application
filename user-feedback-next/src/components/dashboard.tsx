@@ -591,6 +591,7 @@ const Dashboard = ({ user }: { user: any }) => {
   const moveTask = useMutation(api.kanban.moveTask);
   const addFeatureToKanban = useMutation(api.kanban.addFeatureToKanban);
   const removeFromKanban = useMutation(api.kanban.deleteTask);
+  const createKanbanTask = useMutation(api.kanban.createTask);
 
   const roadmapItems = useQuery(
     api.roadmap.listRoadmapItems,
@@ -685,6 +686,24 @@ const Dashboard = ({ user }: { user: any }) => {
       toast.success("Removed from Kanban board");
     } catch (error) {
       toast.error("Failed to remove from Kanban");
+    }
+  };
+
+  // Handle create task inline from kanban column
+  const handleCreateTask = async (taskData: { title: string; description: string; columnId: string }) => {
+    if (!teamId) return;
+    try {
+      await createKanbanTask({
+        teamId,
+        title: taskData.title,
+        description: taskData.description,
+        columnId: taskData.columnId,
+        category: "Feature",
+        priority: "Medium",
+      });
+      toast.success("Task created!");
+    } catch (error) {
+      toast.error("Failed to create task");
     }
   };
 
@@ -841,7 +860,7 @@ const Dashboard = ({ user }: { user: any }) => {
                 </div>
                 <TabsContent value="board" className="w-full max-w-full">
                   <div className="pb-2">
-                    <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} onRemoveFromKanban={handleRemoveFromKanban} />
+                    <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} onRemoveFromKanban={handleRemoveFromKanban} onCreateTask={handleCreateTask} />
                   </div>
                 </TabsContent>
                 <TabsContent value="list">
