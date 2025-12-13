@@ -14,9 +14,12 @@ import type * as featureRequests from "../featureRequests.js";
 import type * as feedback from "../feedback.js";
 import type * as http from "../http.js";
 import type * as kanban from "../kanban.js";
+import type * as migrations from "../migrations.js";
+import type * as public_ from "../public.js";
 import type * as roadmap from "../roadmap.js";
 import type * as router from "../router.js";
-import type * as seed from "../seed.js";
+import type * as teamMembers from "../teamMembers.js";
+import type * as teams from "../teams.js";
 
 import type {
   ApiFromModules,
@@ -31,9 +34,12 @@ declare const fullApi: ApiFromModules<{
   feedback: typeof feedback;
   http: typeof http;
   kanban: typeof kanban;
+  migrations: typeof migrations;
+  public: typeof public_;
   roadmap: typeof roadmap;
   router: typeof router;
-  seed: typeof seed;
+  teamMembers: typeof teamMembers;
+  teams: typeof teams;
 }>;
 
 /**

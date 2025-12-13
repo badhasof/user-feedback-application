@@ -21,12 +21,13 @@ export const addComment = mutation({
     itemType: v.string(),
     content: v.string(),
     isAnonymous: v.boolean(),
+    isPublicSubmission: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
 
-    // Verify team membership for authenticated users
-    if (userId) {
+    // Skip team membership check for public submissions
+    if (!args.isPublicSubmission && userId) {
       const isMember = await verifyTeamMembership(ctx, args.teamId, userId);
       if (!isMember) {
         throw new Error("Not a member of this team");
