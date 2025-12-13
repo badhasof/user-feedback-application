@@ -6,7 +6,7 @@ import { api } from "../../../../convex/_generated/api";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { notFound } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, LayoutGrid, List } from "lucide-react";
+import { Search, LayoutGrid, List, Filter, ArrowUpDown, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { Toaster } from "sonner";
 import { getSessionId } from "@/lib/session";
@@ -25,7 +25,6 @@ export default function UserViewPage({ params }: PageProps) {
   const { teamSlug } = use(params);
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // Get team by slug
@@ -136,7 +135,6 @@ export default function UserViewPage({ params }: PageProps) {
       <PublicHeader
         teamName={team.name}
         teamIcon={team.iconName}
-        onSubmitClick={() => setIsDialogOpen(true)}
       />
 
       <main className="max-w-5xl mx-auto px-6 py-8">
@@ -186,11 +184,11 @@ export default function UserViewPage({ params }: PageProps) {
         </div>
 
         {/* Tab Content */}
-        <div className="min-h-[400px]">
+        <div className="min-h-[400px] overflow-hidden">
           {activeTab === 'roadmap' ? (
             // Roadmap View
             roadmapItems === undefined ? (
-              <div className="text-center py-12">
+              <div className="text-center py-12 w-full">
                 <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
               </div>
             ) : (
@@ -201,71 +199,88 @@ export default function UserViewPage({ params }: PageProps) {
               />
             )
           ) : (
-            // Features & Bugs View
-            <>
-              {/* View Mode Toggle */}
-              <div className="flex items-center justify-end gap-2 mb-6">
-                <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'list' | 'grid')}>
-                  <TabsList>
-                    <TabsTrigger value="list">
-                      <List size={16} />
-                      List
-                    </TabsTrigger>
-                    <TabsTrigger value="grid">
-                      <LayoutGrid size={16} />
-                      Grid
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-
-              {/* Feedback List */}
-              {feedbackList === undefined ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
-                </div>
-              ) : filteredItems.length === 0 ? (
-                <div className="py-20 text-center text-neutral-500">
-                  <p>No {activeTab === 'bugs' ? 'bug reports' : 'feature requests'} found.</p>
+            // Features & Bugs View - matching admin dashboard structure
+            <Tabs defaultValue="board" className="w-full">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 mb-6">
+                <TabsList>
+                  <TabsTrigger value="board">
+                    <LayoutGrid size={16} />
+                    Board
+                  </TabsTrigger>
+                  <TabsTrigger value="list">
+                    <List size={16} />
+                    List View
+                  </TabsTrigger>
+                </TabsList>
+                {/* Header Actions - same as admin KanbanHeaderActions */}
+                <div className="flex items-center gap-4 ml-auto">
+                  <div className="flex items-center gap-3 text-neutral-400">
+                    <button className="hover:text-neutral-200 transition-colors"><Filter size={18} /></button>
+                    <button className="hover:text-neutral-200 transition-colors"><ArrowUpDown size={18} /></button>
+                    <button className="hover:text-neutral-200 transition-colors"><Search size={18} /></button>
+                  </div>
                   <button
                     onClick={() => setIsDialogOpen(true)}
-                    className="mt-4 text-blue-500 hover:text-blue-400 transition-colors"
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20"
                   >
-                    Be the first to submit one!
+                    New <div className="h-4 w-px bg-blue-400/50 mx-1" />
+                    <Plus size={16} />
                   </button>
                 </div>
-              ) : viewMode === 'grid' ? (
+              </div>
+              <TabsContent value="board">
                 <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <AnimatePresence>
-                    {filteredItems.map((item) => (
-                      <PublicFeedbackCard
-                        key={item._id}
-                        item={item}
-                        hasVoted={votedFeedbackItems.has(item._id)}
-                        onVote={() => handleVoteFeedback(item._id)}
-                        viewMode="grid"
-                        teamId={teamId!}
-                      />
-                    ))}
+                    {feedbackList === undefined ? (
+                      <div className="text-center py-12 col-span-full">
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                      </div>
+                    ) : filteredItems.length === 0 ? (
+                      <div className="py-20 text-center text-neutral-500 col-span-full">
+                        <p>No posts found matching your criteria.</p>
+                      </div>
+                    ) : (
+                      filteredItems.map((item) => (
+                        <PublicFeedbackCard
+                          key={item._id}
+                          item={item}
+                          hasVoted={votedFeedbackItems.has(item._id)}
+                          onVote={() => handleVoteFeedback(item._id)}
+                          viewMode="grid"
+                          teamId={teamId!}
+                        />
+                      ))
+                    )}
                   </AnimatePresence>
                 </motion.div>
-              ) : (
+              </TabsContent>
+              <TabsContent value="list">
                 <motion.div layout className="space-y-4">
                   <AnimatePresence>
-                    {filteredItems.map((item) => (
-                      <PublicFeedbackCard
-                        key={item._id}
-                        item={item}
-                        hasVoted={votedFeedbackItems.has(item._id)}
-                        onVote={() => handleVoteFeedback(item._id)}
-                        viewMode="list"
-                        teamId={teamId!}
-                      />
-                    ))}
+                    {feedbackList === undefined ? (
+                      <div className="text-center py-12">
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                      </div>
+                    ) : filteredItems.length === 0 ? (
+                      <div className="py-20 text-center text-neutral-500">
+                        <p>No posts found matching your criteria.</p>
+                      </div>
+                    ) : (
+                      filteredItems.map((item) => (
+                        <PublicFeedbackCard
+                          key={item._id}
+                          item={item}
+                          hasVoted={votedFeedbackItems.has(item._id)}
+                          onVote={() => handleVoteFeedback(item._id)}
+                          viewMode="list"
+                          teamId={teamId!}
+                        />
+                      ))
+                    )}
                   </AnimatePresence>
                 </motion.div>
-              )}
-            </>
+              </TabsContent>
+            </Tabs>
           )}
         </div>
       </main>
