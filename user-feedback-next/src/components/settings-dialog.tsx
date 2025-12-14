@@ -30,8 +30,19 @@ import {
   DialogContent,
   DialogDescription,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Field,
+  FieldContent,
+  FieldDescription,
+  FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Sidebar,
   SidebarContent,
@@ -73,7 +84,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[700px] lg:max-w-[800px]">
+      <DialogContent className="overflow-hidden p-0 md:max-h-[500px] md:max-w-[800px] lg:max-w-[900px]">
         <DialogTitle className="sr-only">Settings</DialogTitle>
         <DialogDescription className="sr-only">
           Customize your settings here.
@@ -119,12 +130,49 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               </div>
             </header>
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
-              {Array.from({ length: 10 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="aspect-video max-w-3xl rounded-xl bg-muted/50"
-                />
-              ))}
+              <div className="w-full max-w-4xl">
+                <form>
+                  <FieldSet>
+                    <FieldLegend>Profile</FieldLegend>
+                    <FieldDescription>Fill in your profile information.</FieldDescription>
+                    <FieldSeparator />
+                    <FieldGroup>
+                      <Field orientation="responsive">
+                        <FieldContent>
+                          <FieldLabel htmlFor="name">Name</FieldLabel>
+                          <FieldDescription>
+                            Provide your full name for identification
+                          </FieldDescription>
+                        </FieldContent>
+                        <Input id="name" placeholder="Evil Rabbit" required />
+                      </Field>
+                      <FieldSeparator />
+                      <Field orientation="responsive">
+                        <FieldContent>
+                          <FieldLabel htmlFor="lastName">Message</FieldLabel>
+                          <FieldDescription>
+                            You can write your message here. Keep it short, preferably
+                            under 100 characters.
+                          </FieldDescription>
+                        </FieldContent>
+                        <Textarea
+                          id="message"
+                          placeholder="Hello, world!"
+                          required
+                          className="min-h-[100px] resize-none sm:min-w-[300px]"
+                        />
+                      </Field>
+                      <FieldSeparator />
+                      <Field orientation="responsive">
+                        <Button type="submit">Submit</Button>
+                        <Button type="button" variant="outline">
+                          Cancel
+                        </Button>
+                      </Field>
+                    </FieldGroup>
+                  </FieldSet>
+                </form>
+              </div>
             </div>
           </main>
         </SidebarProvider>
