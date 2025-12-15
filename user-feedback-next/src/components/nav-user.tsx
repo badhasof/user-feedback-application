@@ -31,7 +31,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { SettingsDialog } from "@/components/settings-dialog"
+import { SettingsDialog, type SettingsSection } from "@/components/settings-dialog"
 
 export function NavUser({
   user,
@@ -44,7 +44,13 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [settingsSection, setSettingsSection] = useState<SettingsSection>("account")
   const { signOut } = useAuthActions()
+
+  const openSettings = (section: SettingsSection) => {
+    setSettingsSection(section)
+    setSettingsOpen(true)
+  }
 
   return (
     <SidebarMenu>
@@ -86,22 +92,22 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => openSettings("billing")}>
                 <Sparkles />
                 Upgrade to Pro
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onSelect={() => setSettingsOpen(true)}>
+              <DropdownMenuItem onSelect={() => openSettings("account")}>
                 <BadgeCheck />
                 Account
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setSettingsOpen(true)}>
+              <DropdownMenuItem onSelect={() => openSettings("billing")}>
                 <CreditCard />
                 Billing
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setSettingsOpen(true)}>
+              <DropdownMenuItem onSelect={() => openSettings("notifications")}>
                 <Bell />
                 Notifications
               </DropdownMenuItem>
@@ -113,7 +119,7 @@ export function NavUser({
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-        <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
+        <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} defaultSection={settingsSection} />
       </SidebarMenuItem>
     </SidebarMenu>
   )

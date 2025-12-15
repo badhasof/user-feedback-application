@@ -2,18 +2,10 @@
 
 import * as React from "react"
 import {
+  BadgeCheck,
   Bell,
-  Check,
-  Globe,
-  Home,
-  Keyboard,
-  Link,
-  Lock,
-  Menu,
-  MessageCircle,
-  Paintbrush,
-  Settings,
-  Video,
+  CreditCard,
+  Users,
 } from "lucide-react"
 
 import {
@@ -24,25 +16,12 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
-import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
-} from "@/components/ui/field"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import {
   Sidebar,
   SidebarContent,
@@ -53,34 +32,49 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from "@/components/ui/sidebar"
+import { AccountContent } from "@/components/settings/account-content"
+import { BillingContent } from "@/components/settings/billing-content"
+import { NotificationsContent } from "@/components/settings/notifications-content"
+import { TeamContent } from "@/components/settings/team-content"
 
-const data = {
-  nav: [
-    { name: "Notifications", icon: Bell },
-    { name: "Navigation", icon: Menu },
-    { name: "Home", icon: Home },
-    { name: "Appearance", icon: Paintbrush },
-    { name: "Messages & media", icon: MessageCircle },
-    { name: "Language & region", icon: Globe },
-    { name: "Accessibility", icon: Keyboard },
-    { name: "Mark as read", icon: Check },
-    { name: "Audio & video", icon: Video },
-    { name: "Connected accounts", icon: Link },
-    { name: "Privacy & visibility", icon: Lock },
-    { name: "Advanced", icon: Settings },
-  ],
+export type SettingsSection = "account" | "billing" | "notifications" | "team"
+
+const navItems = [
+  { id: "account" as const, name: "Account", icon: BadgeCheck },
+  { id: "billing" as const, name: "Billing", icon: CreditCard },
+  { id: "notifications" as const, name: "Notifications", icon: Bell },
+  { id: "team" as const, name: "Team", icon: Users },
+]
+
+const sectionContent: Record<SettingsSection, React.ReactNode> = {
+  account: <AccountContent />,
+  billing: <BillingContent />,
+  notifications: <NotificationsContent />,
+  team: <TeamContent />,
 }
 
 interface SettingsDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  defaultSection?: SettingsSection
 }
 
-export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
+export function SettingsDialog({ open, onOpenChange, defaultSection = "account" }: SettingsDialogProps) {
   const [internalOpen, setInternalOpen] = React.useState(false)
+  const [activeSection, setActiveSection] = React.useState<SettingsSection>(defaultSection)
+
   const isControlled = open !== undefined
   const isOpen = isControlled ? open : internalOpen
   const setIsOpen = isControlled ? onOpenChange! : setInternalOpen
+
+  // Update active section when defaultSection changes
+  React.useEffect(() => {
+    if (open) {
+      setActiveSection(defaultSection)
+    }
+  }, [open, defaultSection])
+
+  const activeNavItem = navItems.find(item => item.id === activeSection)
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -95,16 +89,14 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               <SidebarGroup>
                 <SidebarGroupContent>
                   <SidebarMenu>
-                    {data.nav.map((item) => (
-                      <SidebarMenuItem key={item.name}>
+                    {navItems.map((item) => (
+                      <SidebarMenuItem key={item.id}>
                         <SidebarMenuButton
-                          asChild
-                          isActive={item.name === "Messages & media"}
+                          isActive={item.id === activeSection}
+                          onClick={() => setActiveSection(item.id)}
                         >
-                          <a href="#">
-                            <item.icon />
-                            <span>{item.name}</span>
-                          </a>
+                          <item.icon />
+                          <span>{item.name}</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     ))}
@@ -123,7 +115,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
                     </BreadcrumbItem>
                     <BreadcrumbSeparator className="hidden md:block" />
                     <BreadcrumbItem>
-                      <BreadcrumbPage>Messages & media</BreadcrumbPage>
+                      <BreadcrumbPage>{activeNavItem?.name}</BreadcrumbPage>
                     </BreadcrumbItem>
                   </BreadcrumbList>
                 </Breadcrumb>
@@ -131,47 +123,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
             </header>
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
               <div className="w-full max-w-4xl">
-                <form>
-                  <FieldSet>
-                    <FieldLegend>Profile</FieldLegend>
-                    <FieldDescription>Fill in your profile information.</FieldDescription>
-                    <FieldSeparator />
-                    <FieldGroup>
-                      <Field orientation="responsive">
-                        <FieldContent>
-                          <FieldLabel htmlFor="name">Name</FieldLabel>
-                          <FieldDescription>
-                            Provide your full name for identification
-                          </FieldDescription>
-                        </FieldContent>
-                        <Input id="name" placeholder="Evil Rabbit" required />
-                      </Field>
-                      <FieldSeparator />
-                      <Field orientation="responsive">
-                        <FieldContent>
-                          <FieldLabel htmlFor="lastName">Message</FieldLabel>
-                          <FieldDescription>
-                            You can write your message here. Keep it short, preferably
-                            under 100 characters.
-                          </FieldDescription>
-                        </FieldContent>
-                        <Textarea
-                          id="message"
-                          placeholder="Hello, world!"
-                          required
-                          className="min-h-[100px] resize-none sm:min-w-[300px]"
-                        />
-                      </Field>
-                      <FieldSeparator />
-                      <Field orientation="responsive">
-                        <Button type="submit">Submit</Button>
-                        <Button type="button" variant="outline">
-                          Cancel
-                        </Button>
-                      </Field>
-                    </FieldGroup>
-                  </FieldSet>
-                </form>
+                {sectionContent[activeSection]}
               </div>
             </div>
           </main>
