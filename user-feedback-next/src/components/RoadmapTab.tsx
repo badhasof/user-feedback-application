@@ -43,7 +43,7 @@ export function RoadmapTab() {
       <div>
         <h2 className="text-2xl font-bold text-slate-900">Product Roadmap</h2>
         <p className="text-slate-600 mt-1">
-          See what we're working on and what's coming next
+          See what we&apos;re working on and what&apos;s coming next
         </p>
       </div>
 

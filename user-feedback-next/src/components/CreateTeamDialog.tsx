@@ -55,8 +55,14 @@ export function CreateTeamDialog({
     e.preventDefault();
     if (!name.trim() || !slug.trim()) return;
 
-    if (slugAvailable === false) {
-      toast.error("This team URL is already taken");
+    if (!slugAvailable?.available) {
+      toast.error(
+        slugAvailable?.reason === "reserved"
+          ? "This URL is reserved"
+          : slugAvailable?.reason === "invalid_format"
+          ? "Invalid URL format"
+          : "This URL is already taken"
+      );
       return;
     }
 
@@ -132,8 +138,7 @@ export function CreateTeamDialog({
               <label className="block text-sm text-neutral-400 mb-2">
                 Team URL
               </label>
-              <div className="flex items-center gap-2">
-                <span className="text-neutral-500 text-sm">feedback.app/</span>
+              <div className="flex items-center gap-0 bg-[#1E1E1E] border border-white/10 rounded-lg overflow-hidden focus-within:border-blue-500/50 transition-colors">
                 <input
                   type="text"
                   value={slug}
@@ -142,15 +147,25 @@ export function CreateTeamDialog({
                     setSlugEdited(true);
                   }}
                   placeholder="my-product"
-                  className="flex-1 text-[16px] font-normal placeholder:text-neutral-600 outline-none border border-white/10 rounded-lg px-4 py-3 bg-[#1E1E1E] text-neutral-200 focus:border-blue-500/50 transition-colors"
+                  className="flex-1 text-[16px] font-normal placeholder:text-neutral-600 outline-none px-4 py-3 bg-transparent text-neutral-200"
                 />
+                <span className="text-neutral-500 text-sm px-4 border-l border-white/10 bg-[#141414] py-3">.votivy.com</span>
               </div>
-              {slug && slugAvailable === false && (
-                <p className="text-sm text-red-400 mt-2">
-                  This URL is already taken
+              {slug && (
+                <p className="text-xs text-neutral-500 mt-2">
+                  Your feedback page: <span className="text-neutral-300">{slug}.votivy.com</span>
                 </p>
               )}
-              {slug && slugAvailable === true && (
+              {slug && slugAvailable && !slugAvailable.available && (
+                <p className="text-sm text-red-400 mt-2">
+                  {slugAvailable.reason === "reserved"
+                    ? "This URL is reserved and cannot be used"
+                    : slugAvailable.reason === "invalid_format"
+                    ? "Invalid format. Use 2-63 lowercase letters, numbers, and hyphens."
+                    : "This URL is already taken"}
+                </p>
+              )}
+              {slug && slugAvailable?.available && (
                 <p className="text-sm text-green-400 mt-2 flex items-center gap-1">
                   <Check size={14} /> Available
                 </p>
@@ -196,7 +211,7 @@ export function CreateTeamDialog({
                 isSubmitting ||
                 !name.trim() ||
                 !slug.trim() ||
-                slugAvailable === false
+                !slugAvailable?.available
               }
               className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >

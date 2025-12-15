@@ -2,6 +2,23 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 
+// Reserved subdomains that cannot be used as team slugs
+const RESERVED_SUBDOMAINS = new Set([
+  'www', 'app', 'api', 'admin', 'help', 'support', 'docs', 'blog', 'status',
+  'mail', 'staging', 'dev', 'test', 'dashboard', 'login', 'signup', 'auth',
+  'cdn', 'assets', 'static', 'feedback', 'billing', 'settings', 'account',
+]);
+
+function isReservedSlug(slug: string): boolean {
+  return RESERVED_SUBDOMAINS.has(slug.toLowerCase());
+}
+
+function isValidSlugFormat(slug: string): boolean {
+  if (!slug || slug.length < 2 || slug.length > 63) return false;
+  const slugRegex = /^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]$/;
+  return slugRegex.test(slug.toLowerCase());
+}
+
 // Create a new team
 export const createTeam = mutation({
   args: {
@@ -16,6 +33,16 @@ export const createTeam = mutation({
       throw new Error("Not authenticated");
     }
 
+    // Validate slug format
+    if (!isValidSlugFormat(args.slug)) {
+      throw new Error("Invalid URL format. Use 2-63 lowercase letters, numbers, and hyphens.");
+    }
+
+    // Check if slug is reserved
+    if (isReservedSlug(args.slug)) {
+      throw new Error("This URL is reserved and cannot be used");
+    }
+
     // Validate slug uniqueness
     const existing = await ctx.db
       .query("teams")
@@ -23,7 +50,7 @@ export const createTeam = mutation({
       .first();
 
     if (existing) {
-      throw new Error("Team slug already exists");
+      throw new Error("This URL is already taken");
     }
 
     // Create the team
@@ -261,10 +288,26 @@ export const deleteTeam = mutation({
 export const checkSlugAvailable = query({
   args: { slug: v.string() },
   handler: async (ctx, args) => {
+    // Check format validity
+    if (!isValidSlugFormat(args.slug)) {
+      return { available: false, reason: "invalid_format" };
+    }
+
+    // Check if reserved
+    if (isReservedSlug(args.slug)) {
+      return { available: false, reason: "reserved" };
+    }
+
+    // Check if already taken
     const existing = await ctx.db
       .query("teams")
       .withIndex("by_slug", (q) => q.eq("slug", args.slug))
       .first();
-    return !existing;
+
+    if (existing) {
+      return { available: false, reason: "taken" };
+    }
+
+    return { available: true, reason: null };
   },
 });

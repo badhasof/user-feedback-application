@@ -21,7 +21,7 @@ interface PageProps {
   params: Promise<{ teamSlug: string }>;
 }
 
-export default function UserViewPage({ params }: PageProps) {
+export default function SubdomainPage({ params }: PageProps) {
   const { teamSlug } = use(params);
   const [activeTab, setActiveTab] = useState('features');
   const [searchQuery, setSearchQuery] = useState('');

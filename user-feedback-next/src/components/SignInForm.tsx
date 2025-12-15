@@ -159,7 +159,7 @@ export function SignInForm() {
         {/* Footer Quote */}
         <div className="mt-8 text-center">
           <p className="text-sm text-neutral-600 italic">
-            "This feedback platform helped us ship better products faster."
+            &quot;This feedback platform helped us ship better products faster.&quot;
           </p>
           <p className="text-xs text-neutral-700 mt-1">- Sofia Davis</p>
         </div>
