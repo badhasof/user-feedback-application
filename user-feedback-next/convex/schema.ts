@@ -9,6 +9,7 @@ const applicationTables = {
     slug: v.string(),
     plan: v.string(),
     iconName: v.string(),
+    brandColor: v.optional(v.string()),
     ownerId: v.id("users"),
     createdAt: v.number(),
   })
