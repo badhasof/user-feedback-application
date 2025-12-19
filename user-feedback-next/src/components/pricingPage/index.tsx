@@ -149,11 +149,11 @@ export function PricingPage({
   };
 
   return (
-    <div className={`pricing-container pb-40 min-720:pb-48 ${className}`}>
+    <div className={`pricing-container pb-[40px] min-720:pb-[48px] ${className}`}>
       <div className="flex flex-col items-center">
         {/* Header Section */}
-        <div className="pb-24 min-1280:pb-32">
-          <div className="flex flex-col gap-y-24 pt-24 min-720:pt-40 min-1280:pt-64">
+        <div className="pb-[24px] min-1280:pb-[32px]">
+          <div className="flex flex-col gap-y-[24px] pt-[24px] min-720:pt-[40px] min-1280:pt-[64px]">
             <h1 className="text-center font-semibold text-spotlight min-1280:text-showcase text-text-primary">
               {headline}
             </h1>
@@ -164,7 +164,7 @@ export function PricingPage({
         </div>
 
         {/* Billing Interval Selector */}
-        <div className="pb-40 min-1280:pb-48">
+        <div className="pb-[40px] min-1280:pb-[48px]">
           <BillingToggle
             interval={billingInterval}
             onToggle={handleToggle}
@@ -174,8 +174,8 @@ export function PricingPage({
         </div>
 
         {/* Pricing Cards */}
-        <div className="flex flex-col items-stretch self-stretch pb-40 min-1280:pb-48">
-          <div className="grid grid-rows-2 gap-24 min-840:grid-cols-2 min-840:grid-rows-1 pb-[48px]">
+        <div className="flex flex-col items-stretch self-stretch pb-[40px] min-1280:pb-[48px]">
+          <div className="grid grid-rows-2 gap-[24px] min-840:grid-cols-2 min-840:grid-rows-1 pb-[48px]">
             {tiers.map((tier, idx) => (
               <div key={idx} className={idx === 0 ? "flex" : ""}>
                 <PricingCard
@@ -198,7 +198,7 @@ export function PricingPage({
 
           {/* Info Cards */}
           {infoCards && infoCards.length > 0 && (
-            <div className="flex flex-col gap-y-40 min-720:flex-row min-720:gap-x-24 pt-[40px]">
+            <div className="flex flex-col gap-y-[40px] min-720:flex-row min-720:gap-x-[24px] pt-[40px]">
               {infoCards.map((card, idx) => (
                 <InfoCard
                   key={idx}
