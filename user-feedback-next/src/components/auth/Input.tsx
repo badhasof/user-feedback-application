@@ -8,7 +8,7 @@ export const Input: React.FC<InputProps> = (props) => {
       <input
         {...props}
         className={`
-          peer w-full bg-transparent border border-authBorder rounded px-4 py-3.5
+          peer w-full bg-transparent border border-authBorder rounded-lg px-4 py-3.5
           text-textMain placeholder-transparent focus:outline-none focus:border-authPrimary focus:ring-1 focus:ring-authPrimary
           transition-all duration-200 text-[15px]
           ${props.className || ''}

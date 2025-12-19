@@ -288,7 +288,7 @@ const AuthScreen: React.FC = () => {
               type="button"
               onClick={handleAnonymousAuth}
               disabled={submitting}
-              className="w-full bg-transparent border border-authBorder hover:bg-[#2A2B32] text-textMain font-normal rounded py-3.5 px-4 transition-colors duration-200 text-base disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-transparent border border-authBorder hover:bg-[#2A2B32] text-textMain font-normal rounded-lg py-3.5 px-4 transition-colors duration-200 text-base disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue as Guest
             </button>
