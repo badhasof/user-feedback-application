@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useAuthActions } from "@convex-dev/auth/react";
 import { toast } from "sonner";
-import { Logo } from './Logo';
+import Image from 'next/image';
 import { SocialButton } from './SocialButton';
 import { Divider } from './Divider';
 import { Input } from './Input';
@@ -105,8 +105,8 @@ const AuthScreen: React.FC = () => {
       <div className="min-h-screen w-full flex items-center justify-center bg-authBackground text-textMain selection:bg-authPrimary/30">
         <div className="w-full max-w-[400px] px-5 sm:px-0 flex flex-col items-center animate-in fade-in zoom-in duration-500">
           {/* Logo Section */}
-          <div className="mb-10">
-            <Logo className="w-12 h-12 text-textMain" />
+          <div className="mb-4 h-[100px] overflow-hidden flex items-end justify-center">
+            <Image src="/logo.png" alt="Logo" width={240} height={240} className="-mb-[60px]" />
           </div>
 
           {/* Header Text */}
@@ -200,8 +200,8 @@ const AuthScreen: React.FC = () => {
     <div className="min-h-screen w-full flex items-center justify-center bg-authBackground text-textMain selection:bg-authPrimary/30">
       <div className="w-full max-w-[400px] px-5 sm:px-0 flex flex-col items-center animate-in fade-in zoom-in duration-500">
         {/* Logo Section */}
-        <div className="mb-10">
-          <Logo className="w-12 h-12 text-textMain" />
+        <div className="mb-4 h-[100px] overflow-hidden flex items-end justify-center">
+          <Image src="/logo.png" alt="Logo" width={240} height={240} className="-mb-[60px]" />
         </div>
 
         {/* Header Text */}
