@@ -1,5 +1,21 @@
 import { mutation } from "./_generated/server";
 
+// Delete anonymous users (no email)
+export const deleteAnonymousUsers = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const users = await ctx.db.query("users").collect();
+    let deleted = 0;
+    for (const user of users) {
+      if (!user.email) {
+        await ctx.db.delete(user._id);
+        deleted++;
+      }
+    }
+    return { deleted };
+  },
+});
+
 // One-time migration to clear old data without teamId
 export const clearLegacyData = mutation({
   args: {},

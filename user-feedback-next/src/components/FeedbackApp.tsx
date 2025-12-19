@@ -11,7 +11,20 @@ import { Separator } from "@/components/ui/separator";
 import { TeamProvider, useTeam } from "@/contexts/TeamContext";
 import { NoTeamsState } from "./NoTeamsState";
 
-function FeedbackAppContent({ user }: { user: any }) {
+interface UserWithProfile {
+  _id: string;
+  name?: string;
+  email?: string;
+  isAnonymous?: boolean;
+  profile?: {
+    name?: string;
+    company?: string;
+    role?: string;
+    avatarUrl?: string | null;
+  } | null;
+}
+
+function FeedbackAppContent({ user }: { user: UserWithProfile }) {
   const { teams, activeTeam, isLoading } = useTeam();
 
   // Loading state
@@ -26,7 +39,7 @@ function FeedbackAppContent({ user }: { user: any }) {
     );
   }
 
-  // No teams state - show onboarding
+  // No teams state - show team creation
   if (teams.length === 0 || !activeTeam) {
     return <NoTeamsState />;
   }
@@ -54,7 +67,7 @@ function FeedbackAppContent({ user }: { user: any }) {
   );
 }
 
-export function FeedbackApp({ user }: { user: any }) {
+export function FeedbackApp({ user }: { user: UserWithProfile }) {
   return (
     <TeamProvider>
       <FeedbackAppContent user={user} />
