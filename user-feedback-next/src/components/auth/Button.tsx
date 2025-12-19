@@ -7,9 +7,9 @@ export const Button: React.FC<ButtonProps> = ({ children, className, ...props })
     <button
       {...props}
       className={`
-        w-full bg-authPrimary hover:bg-authPrimaryHover text-white font-medium
+        w-full bg-authPrimary hover:bg-authPrimaryHover text-white font-normal
         rounded py-3.5 px-4 transition-colors duration-200
-        text-[15px] shadow-sm disabled:opacity-50 disabled:cursor-not-allowed
+        text-base shadow-sm disabled:opacity-50 disabled:cursor-not-allowed
         flex items-center justify-center
         ${className || ''}
       `}

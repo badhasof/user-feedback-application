@@ -16,9 +16,9 @@ export const SocialButton: React.FC<SocialButtonProps> = ({ provider, className,
       {...props}
       className={`
         relative w-full bg-transparent border border-authBorder hover:bg-[#2A2B32]
-        text-textMain font-medium rounded py-3.5 px-4
+        text-textMain font-normal rounded py-3.5 px-4
         transition-colors duration-200 flex items-center justify-start
-        text-[15px] disabled:opacity-50 disabled:cursor-not-allowed
+        text-base disabled:opacity-50 disabled:cursor-not-allowed
         ${className || ''}
       `}
     >
