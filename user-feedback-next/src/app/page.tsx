@@ -2,7 +2,7 @@
 
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { SignInForm } from "@/components/SignInForm";
+import AuthScreen from "@/components/auth/AuthScreen";
 import { Toaster } from "sonner";
 import { FeedbackApp } from "@/components/FeedbackApp";
 
@@ -39,7 +39,7 @@ function Content() {
   return (
     <>
       <Unauthenticated>
-        <SignInForm />
+        <AuthScreen />
       </Unauthenticated>
 
       <Authenticated>
