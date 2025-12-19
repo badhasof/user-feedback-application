@@ -8,6 +8,13 @@ export default {
   theme: {
   	extend: {
   		colors: {
+  			// Auth screen colors
+  			authBackground: '#0f0f0f',
+  			authPrimary: '#10a37f',
+  			authPrimaryHover: '#0d8a6c',
+  			authBorder: '#2A2B32',
+  			textMain: '#ECECF1',
+  			textMuted: '#8E8EA0',
   			border: 'hsl(var(--border))',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
