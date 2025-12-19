@@ -1,0 +1,311 @@
+/* Pricing Page - Design Tokens & Utilities */
+
+/* ===== CSS Variables ===== */
+:root {
+  /* Neutral Scale */
+  --neutral-0: 0 0% 100%;
+  --neutral-5: 0 0% 96%;
+  --neutral-10: 0 0% 93%;
+  --neutral-20: 0 0% 86%;
+  --neutral-30: 0 0% 76%;
+  --neutral-40: 0 0% 68%;
+  --neutral-50: 0 0% 53%;
+  --neutral-60: 0 0% 44%;
+  --neutral-70: 0 0% 36%;
+  --neutral-80: 0 0% 25%;
+  --neutral-90: 0 0% 15%;
+  --neutral-95: 0 0% 12%;
+  --neutral-100: 0 0% 8%;
+
+  /* Blue Scale */
+  --blue-5: 205 100% 96%;
+  --blue-10: 206 100% 92%;
+  --blue-20: 206 100% 84%;
+  --blue-30: 206 100% 74%;
+  --blue-40: 206 100% 65%;
+  --blue-50: 208 100% 53%;
+  --blue-60: 212 100% 50%;
+  --blue-70: 216 100% 50%;
+  --blue-80: 222 100% 47%;
+  --blue-90: 226 100% 35%;
+  --blue-95: 227 100% 29%;
+
+  /* Green Scale */
+  --green-5: 97 100% 94%;
+  --green-10: 94 89% 82%;
+  --green-20: 94 92% 72%;
+  --green-30: 94 78% 61%;
+  --green-40: 95 68% 52%;
+  --green-50: 96 83% 41%;
+  --green-60: 103 79% 35%;
+  --green-70: 107 88% 26%;
+  --green-80: 113 100% 18%;
+  --green-90: 120 100% 13%;
+  --green-95: 120 100% 9%;
+
+  /* Red Scale */
+  --red-5: 16 100% 96%;
+  --red-10: 17 100% 92%;
+  --red-20: 18 100% 85%;
+  --red-30: 18 100% 74%;
+  --red-40: 18 100% 65%;
+  --red-50: 18 100% 52%;
+  --red-60: 18 100% 44%;
+  --red-70: 12 96% 41%;
+  --red-80: 9 100% 34%;
+  --red-90: 8 100% 21%;
+  --red-95: 8 100% 17%;
+
+  /* Yellow Scale */
+  --yellow-5: 53 100% 88%;
+  --yellow-10: 47 100% 83%;
+  --yellow-20: 49 100% 66%;
+  --yellow-30: 48 100% 50%;
+  --yellow-40: 46 100% 46%;
+  --yellow-50: 42 100% 39%;
+  --yellow-60: 36 100% 33%;
+  --yellow-70: 34 100% 27%;
+  --yellow-80: 30 100% 20%;
+  --yellow-90: 24 100% 12%;
+  --yellow-95: 21 100% 10%;
+
+  /* Purple Scale */
+  --purple-5: 279 100% 97%;
+  --purple-10: 279 100% 94%;
+  --purple-20: 280 100% 87%;
+  --purple-30: 280 100% 79%;
+  --purple-40: 280 97% 72%;
+  --purple-50: 280 62% 56%;
+  --purple-60: 280 56% 49%;
+  --purple-70: 275 69% 49%;
+  --purple-80: 275 81% 41%;
+  --purple-90: 275 100% 30%;
+  --purple-95: 275 100% 24%;
+
+  /* Semantic Colors - Text */
+  --text-primary: 0 0% 8%;
+  --text-secondary: 0 0% 44%;
+  --text-tertiary: 0 0% 68%;
+  --text-inverse: 0 0% 100%;
+  --text-disabled: 0 0% 68%;
+  --text-on-brand: 0 0% 100%;
+  --text-negative: 12 96% 41%;
+  --text-positive: 107 88% 26%;
+  --text-link-primary: 216 100% 50%;
+  --text-on-negative-primary: 0 0% 100%;
+  --text-on-negative-secondary: 12 96% 41%;
+  --text-on-positive: 0 0% 100%;
+
+  /* Semantic Colors - Background */
+  --background-primary: 0 0% 100%;
+  --background-primary-hover: 0 0% 25%/6%;
+  --background-secondary: 0 0% 25%/6%;
+  --background-secondary-hover: 0 0% 25%/10%;
+  --background-tertiary: 0 0% 25%/8%;
+  --background-tertiary-hover: 0 0% 25%/12%;
+  --background-inverse: 0 0% 8%;
+  --background-inverse-hover: 0 0% 15%;
+  --background-brand: 216 100% 50%;
+  --background-brand-hover: 222 100% 47%;
+  --background-disabled: 0 0% 25%/8%;
+  --background-overlay: 0 0% 0%/60%;
+  --background-modal: 0 0% 100%;
+  --background-positive: 103 79% 35%;
+  --background-warning: 36 100% 33%;
+  --background-negative-primary: 18 100% 44%;
+  --background-negative-primary-hover: 12 96% 41%;
+  --background-negative-secondary: 17 100% 92%;
+  --background-negative-secondary-hover: 18 100% 85%;
+  --background-negative-ghost: 0 0% 100%/0%;
+  --background-negative-ghost-hover: 17 100% 92%;
+
+  /* Semantic Colors - Border */
+  --border-primary: 0 0% 8%;
+  --border-secondary: 0 0% 25%/8%;
+  --border-tertiary: 0 0% 25%/16%;
+  --border-tertiary-hover: 0 0% 25%/24%;
+  --border-divider: 0 0% 93%;
+  --border-brand: 216 100% 50%;
+  --border-negative: 18 100% 44%;
+  --border-disabled: 0 0% 25%/8%;
+}
+
+/* ===== Typography Classes ===== */
+.text-spotlight {
+  font-size: 56px;
+  line-height: 56px;
+  letter-spacing: -0.01em;
+  font-weight: 652;
+}
+
+.text-showcase {
+  font-size: 80px;
+  line-height: 80px;
+  letter-spacing: -0.01em;
+  font-weight: 652;
+}
+
+.text-title-1 {
+  font-size: 44px;
+  line-height: 44px;
+  letter-spacing: -0.01em;
+  font-weight: 652;
+}
+
+.text-title-2 {
+  font-size: 32px;
+  line-height: 36px;
+  letter-spacing: 0px;
+  font-weight: 652;
+}
+
+.text-title-3 {
+  font-size: 24px;
+  line-height: 30px;
+  letter-spacing: 0px;
+  font-weight: 652;
+}
+
+.text-feature {
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: 0px;
+  font-weight: 440;
+}
+
+.text-feature-bold {
+  font-size: 20px;
+  line-height: 28px;
+  letter-spacing: 0px;
+  font-weight: 600;
+}
+
+.text-body {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.009em;
+  font-weight: 456;
+}
+
+.text-body-bold {
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.009em;
+  font-weight: 600;
+}
+
+.text-caption {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.017em;
+  font-weight: 456;
+}
+
+.text-caption-bold {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.017em;
+  font-weight: 600;
+}
+
+/* ===== Text Colors ===== */
+.text-text-primary { color: hsl(var(--text-primary)); }
+.text-text-secondary { color: hsl(var(--text-secondary)); }
+.text-text-tertiary { color: hsl(var(--text-tertiary)); }
+.text-text-inverse { color: hsl(var(--text-inverse)); }
+.text-text-disabled { color: hsl(var(--text-disabled)); }
+.text-text-on-brand { color: hsl(var(--text-on-brand)); }
+.text-text-negative { color: hsl(var(--text-negative)); }
+.text-text-positive { color: hsl(var(--text-positive)); }
+.text-text-link-primary { color: hsl(var(--text-link-primary)); }
+
+/* ===== Background Colors ===== */
+.bg-background-primary { background-color: hsl(var(--background-primary)); }
+.bg-background-primary-hover { background-color: hsl(var(--background-primary-hover)); }
+.bg-background-secondary { background-color: hsl(var(--background-secondary)); }
+.bg-background-secondary-hover { background-color: hsl(var(--background-secondary-hover)); }
+.bg-background-tertiary { background-color: hsl(var(--background-tertiary)); }
+.bg-background-tertiary-hover { background-color: hsl(var(--background-tertiary-hover)); }
+.bg-background-inverse { background-color: hsl(var(--background-inverse)); }
+.bg-background-inverse-hover { background-color: hsl(var(--background-inverse-hover)); }
+.bg-background-brand { background-color: hsl(var(--background-brand)); }
+.bg-background-brand-hover { background-color: hsl(var(--background-brand-hover)); }
+.bg-background-disabled { background-color: hsl(var(--background-disabled)); }
+
+/* ===== Border Colors ===== */
+.border-border-primary { border-color: hsl(var(--border-primary)); }
+.border-border-secondary { border-color: hsl(var(--border-secondary)); }
+.border-border-tertiary { border-color: hsl(var(--border-tertiary)); }
+.border-border-divider { border-color: hsl(var(--border-divider)); }
+.border-border-brand { border-color: hsl(var(--border-brand)); }
+
+/* ===== Stroke Colors ===== */
+.stroke-text-primary { stroke: hsl(var(--text-primary)); }
+.stroke-text-secondary { stroke: hsl(var(--text-secondary)); }
+.stroke-text-tertiary { stroke: hsl(var(--text-tertiary)); }
+.stroke-text-inverse { stroke: hsl(var(--text-inverse)); }
+
+/* ===== Shadow Utilities ===== */
+.shadow-inset-1 {
+  --tw-shadow: inset 0px 0px 0px 1px transparent;
+  box-shadow: var(--tw-shadow);
+}
+.shadow-border-tertiary {
+  --tw-shadow: inset 0px 0px 0px 1px hsl(var(--border-tertiary));
+  box-shadow: var(--tw-shadow);
+}
+.shadow-border-tertiary-hover {
+  --tw-shadow: inset 0px 0px 0px 1px hsl(var(--border-tertiary-hover));
+  box-shadow: var(--tw-shadow);
+}
+
+/* ===== Custom Sizing ===== */
+.size-16 { width: 16px; height: 16px; }
+.size-20 { width: 20px; height: 20px; }
+.size-24 { width: 24px; height: 24px; }
+
+/* ===== Pricing Container ===== */
+.pricing-container {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (min-width: 840px) {
+  .pricing-container {
+    max-width: 808px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .pricing-container {
+    max-width: 840px;
+  }
+}
+
+/* ===== Responsive Classes ===== */
+@media (min-width: 720px) {
+  .min-720\:pb-48 { padding-bottom: 48px; }
+  .min-720\:pt-40 { padding-top: 40px; }
+  .min-720\:flex-row { flex-direction: row; }
+  .min-720\:gap-x-24 { column-gap: 24px; }
+}
+
+@media (min-width: 840px) {
+  .min-840\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .min-840\:grid-rows-1 { grid-template-rows: repeat(1, minmax(0, 1fr)); }
+}
+
+@media (min-width: 1280px) {
+  .min-1280\:pb-32 { padding-bottom: 32px; }
+  .min-1280\:pb-48 { padding-bottom: 48px; }
+  .min-1280\:pb-80 { padding-bottom: 80px; }
+  .min-1280\:pt-40 { padding-top: 40px; }
+  .min-1280\:pt-64 { padding-top: 64px; }
+  .min-1280\:text-showcase {
+    font-size: 80px;
+    line-height: 80px;
+    letter-spacing: -0.01em;
+    font-weight: 652;
+  }
+}

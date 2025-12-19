@@ -1,14 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Building2, Plus, Users } from "lucide-react";
+import { Building2, LogOut, Plus, Users } from "lucide-react";
 import { CreateTeamDialog } from "./CreateTeamDialog";
+import { useAuthActions } from "@convex-dev/auth/react";
 
 export function NoTeamsState() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const { signOut } = useAuthActions();
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center p-4 relative">
+      {/* Logout button */}
+      <button
+        onClick={() => signOut()}
+        className="absolute top-4 right-4 flex items-center gap-2 text-neutral-500 hover:text-neutral-300 text-sm transition-colors"
+      >
+        <LogOut size={16} />
+        Sign out
+      </button>
+
       <div className="max-w-md w-full text-center">
         {/* Icon */}
         <div className="mx-auto w-16 h-16 bg-[#1E1E1E] rounded-2xl flex items-center justify-center mb-6">
