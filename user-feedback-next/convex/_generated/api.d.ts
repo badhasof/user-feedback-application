@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
 import type * as comments from "../comments.js";
 import type * as featureRequests from "../featureRequests.js";
@@ -20,6 +21,7 @@ import type * as roadmap from "../roadmap.js";
 import type * as router from "../router.js";
 import type * as teamMembers from "../teamMembers.js";
 import type * as teams from "../teams.js";
+import type * as userProfiles from "../userProfiles.js";
 
 import type {
   ApiFromModules,
@@ -28,6 +30,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  admin: typeof admin;
   auth: typeof auth;
   comments: typeof comments;
   featureRequests: typeof featureRequests;
@@ -40,6 +43,7 @@ declare const fullApi: ApiFromModules<{
   router: typeof router;
   teamMembers: typeof teamMembers;
   teams: typeof teams;
+  userProfiles: typeof userProfiles;
 }>;
 
 /**

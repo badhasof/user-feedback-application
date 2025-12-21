@@ -3,6 +3,28 @@ import { v } from "convex/values";
 import { authTables } from "@convex-dev/auth/server";
 
 const applicationTables = {
+  // User profiles (for onboarding data)
+  userProfiles: defineTable({
+    userId: v.id("users"),
+    fullName: v.optional(v.string()),
+    avatarStorageId: v.optional(v.id("_storage")),
+    avatarUrl: v.optional(v.string()),
+    jobTitle: v.optional(v.string()),
+    companyName: v.optional(v.string()),
+    companySize: v.optional(v.string()),
+    useCases: v.optional(v.array(v.string())),
+    referralSource: v.optional(v.string()),
+    goals: v.optional(v.string()),
+    onboardingCompleted: v.optional(v.boolean()), // Optional for legacy data
+    createdAt: v.number(),
+    updatedAt: v.optional(v.number()),
+    // Legacy fields from old test data (can be removed after cleanup)
+    name: v.optional(v.string()),
+    company: v.optional(v.string()),
+    role: v.optional(v.string()),
+    isSuperAdmin: v.optional(v.boolean()),
+  }).index("by_user", ["userId"]),
+
   // Team management tables
   teams: defineTable({
     name: v.string(),
