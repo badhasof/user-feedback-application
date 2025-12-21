@@ -76,7 +76,7 @@ export const PreferencesStep: React.FC<PreferencesStepProps> = ({
         </button>
 
         {showSourceDropdown && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1f1f] border border-authBorder rounded-lg overflow-hidden z-10 shadow-lg max-h-64 overflow-y-auto">
+          <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#1f1f1f] border border-authBorder rounded-lg overflow-hidden z-10 shadow-lg max-h-64 overflow-y-auto p-1.5">
             {REFERRAL_SOURCES.map((source) => (
               <button
                 key={source.value}
@@ -86,7 +86,7 @@ export const PreferencesStep: React.FC<PreferencesStepProps> = ({
                   setShowSourceDropdown(false);
                 }}
                 className={`
-                  w-full px-4 py-3 text-left text-[15px] transition-colors
+                  w-full px-3 py-2.5 text-left text-[15px] transition-colors rounded-md
                   hover:bg-authPrimary/10
                   ${referralSource === source.value ? 'text-authPrimary bg-authPrimary/5' : 'text-textMain'}
                 `}
@@ -128,7 +128,7 @@ export const PreferencesStep: React.FC<PreferencesStepProps> = ({
             peer-placeholder-shown:text-[15px]
             peer-placeholder-shown:top-3.5
             peer-focus:-top-2.5 peer-focus:text-xs peer-focus:bg-authBackground peer-focus:px-1 peer-focus:text-authPrimary
-            peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-xs peer-not-placeholder-shown:bg-authBackground peer-not-placeholder-shown:px-1
+            peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-authBackground peer-[:not(:placeholder-shown)]:px-1
           "
         >
           What are you hoping to achieve?

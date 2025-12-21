@@ -144,7 +144,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ user, onComplete
     <div className="min-h-screen w-full flex items-center justify-center bg-authBackground text-textMain selection:bg-authPrimary/30">
       <div className="w-full max-w-[440px] px-5 sm:px-0 flex flex-col items-center animate-in fade-in zoom-in duration-500">
         {/* Logo Section */}
-        <div className="mb-6 h-[80px] overflow-hidden flex items-end justify-center">
+        <div className="mb-6 h-[88px] overflow-hidden flex items-end justify-center">
           <Image src="/logo.png" alt="Logo" width={200} height={200} className="-mb-[50px]" />
         </div>
 
