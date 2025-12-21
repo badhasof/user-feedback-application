@@ -23,7 +23,7 @@ export const Input: React.FC<InputProps> = (props) => {
           peer-placeholder-shown:text-[15px]
           peer-placeholder-shown:top-3.5
           peer-focus:-top-2.5 peer-focus:text-xs peer-focus:bg-authBackground peer-focus:px-1 peer-focus:text-authPrimary
-          peer-not-placeholder-shown:-top-2.5 peer-not-placeholder-shown:text-xs peer-not-placeholder-shown:bg-authBackground peer-not-placeholder-shown:px-1
+          peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-authBackground peer-[:not(:placeholder-shown)]:px-1
         "
       >
         {props.placeholder}

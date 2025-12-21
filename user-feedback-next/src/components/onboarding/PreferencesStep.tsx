@@ -76,7 +76,7 @@ export const PreferencesStep: React.FC<PreferencesStepProps> = ({
         </button>
 
         {showSourceDropdown && (
-          <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#1f1f1f] border border-authBorder rounded-lg overflow-hidden z-10 shadow-lg max-h-64 overflow-y-auto p-1.5">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1f1f] border border-authBorder rounded-lg overflow-hidden z-10 shadow-lg max-h-64 overflow-y-auto p-1.5">
             {REFERRAL_SOURCES.map((source) => (
               <button
                 key={source.value}

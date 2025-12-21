@@ -127,7 +127,7 @@ export const WorkInfoStep: React.FC<WorkInfoStepProps> = ({
         </button>
 
         {showSizeDropdown && (
-          <div className="absolute bottom-full left-0 right-0 mb-1 bg-[#1f1f1f] border border-authBorder rounded-lg overflow-hidden z-10 shadow-lg p-1.5">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-[#1f1f1f] border border-authBorder rounded-lg overflow-hidden z-10 shadow-lg p-1.5">
             {COMPANY_SIZES.map((size) => (
               <button
                 key={size.value}
