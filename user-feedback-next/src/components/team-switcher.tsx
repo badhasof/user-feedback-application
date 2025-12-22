@@ -61,7 +61,7 @@ export function TeamSwitcher() {
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold text-neutral-400">
-                  Create a team
+                  Create a workspace
                 </span>
                 <span className="truncate text-xs text-neutral-500">
                   Get started
@@ -109,7 +109,7 @@ export function TeamSwitcher() {
               sideOffset={4}
             >
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Teams
+                Workspaces
               </DropdownMenuLabel>
               {teams.map((team, index) => {
                 const TeamIcon = getIconComponent(team.iconName);
@@ -136,7 +136,7 @@ export function TeamSwitcher() {
                   <Plus className="size-4" />
                 </div>
                 <div className="font-medium text-muted-foreground">
-                  Add team
+                  Add workspace
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>

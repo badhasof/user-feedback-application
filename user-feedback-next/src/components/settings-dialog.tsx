@@ -43,7 +43,7 @@ const navItems = [
   { id: "account" as const, name: "Account", icon: BadgeCheck },
   { id: "billing" as const, name: "Billing", icon: CreditCard },
   { id: "notifications" as const, name: "Notifications", icon: Bell },
-  { id: "team" as const, name: "Team", icon: Users },
+  { id: "team" as const, name: "Workspace", icon: Users },
 ]
 
 const sectionContent: Record<SettingsSection, React.ReactNode> = {

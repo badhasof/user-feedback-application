@@ -33,7 +33,7 @@ export function NoTeamsState() {
 
         {/* Description */}
         <p className="text-neutral-500 mb-8 leading-relaxed">
-          Create your first team to start collecting and managing feedback for
+          Create your first workspace to start collecting and managing feedback for
           your products and projects.
         </p>
 
@@ -43,7 +43,7 @@ export function NoTeamsState() {
           className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-lg text-sm font-medium transition-colors shadow-lg shadow-blue-900/20"
         >
           <Plus size={18} />
-          Create your first team
+          Create your first workspace
         </button>
 
         {/* Features */}
@@ -54,10 +54,10 @@ export function NoTeamsState() {
             </div>
             <div>
               <h3 className="text-sm font-medium text-neutral-200 mb-1">
-                Multi-team support
+                Multi-workspace support
               </h3>
               <p className="text-xs text-neutral-500">
-                Create separate teams for each of your products or projects
+                Create separate workspaces for each of your products or projects
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export function NoTeamsState() {
                 Invite collaborators
               </h3>
               <p className="text-xs text-neutral-500">
-                Share invite links to add team members and collaborate
+                Share invite links to add members and collaborate
               </p>
             </div>
           </div>

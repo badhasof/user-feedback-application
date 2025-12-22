@@ -75,7 +75,7 @@ export function CreateTeamDialog({
         plan: "Free",
       });
 
-      toast.success("Team created successfully!");
+      toast.success("Workspace created successfully!");
 
       // Set the new team as active
       setActiveTeam({
@@ -96,7 +96,7 @@ export function CreateTeamDialog({
       setSelectedIcon("Building");
       setOpen(false);
     } catch (error: any) {
-      toast.error(error.message || "Failed to create team");
+      toast.error(error.message || "Failed to create workspace");
     } finally {
       setIsSubmitting(false);
     }
@@ -110,10 +110,10 @@ export function CreateTeamDialog({
           {/* Header */}
           <div className="px-8 pt-8 pb-5">
             <DialogTitle className="text-xl font-normal text-neutral-100 tracking-tight">
-              Create a new team
+              Create a new workspace
             </DialogTitle>
             <p className="text-[15px] text-neutral-500 mt-1.5 font-normal">
-              Teams let you organize feedback for different projects or products
+              Workspaces let you organize feedback for different projects or products
             </p>
           </div>
 
@@ -122,7 +122,7 @@ export function CreateTeamDialog({
             {/* Team Name */}
             <div>
               <label className="block text-sm text-neutral-400 mb-2">
-                Team name
+                Workspace name
               </label>
               <input
                 type="text"
@@ -136,7 +136,7 @@ export function CreateTeamDialog({
             {/* Team URL/Slug */}
             <div>
               <label className="block text-sm text-neutral-400 mb-2">
-                Team URL
+                Workspace URL
               </label>
               <div className="flex items-center gap-0 bg-[#1E1E1E] border border-white/10 rounded-lg overflow-hidden focus-within:border-blue-500/50 transition-colors">
                 <input
@@ -175,7 +175,7 @@ export function CreateTeamDialog({
             {/* Icon Selection */}
             <div>
               <label className="block text-sm text-neutral-400 mb-2">
-                Team icon
+                Workspace icon
               </label>
               <div className="grid grid-cols-10 gap-2">
                 {TEAM_ICONS.map(({ name: iconName, icon: Icon }) => (
@@ -215,7 +215,7 @@ export function CreateTeamDialog({
               }
               className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Creating..." : "Create team"}
+              {isSubmitting ? "Creating..." : "Create workspace"}
               <Plus size={16} />
             </button>
           </div>

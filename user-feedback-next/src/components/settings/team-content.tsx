@@ -16,15 +16,15 @@ export function TeamContent() {
     <FieldGroup>
       <Field orientation="responsive">
         <FieldContent>
-          <FieldLabel htmlFor="team-name">Team Name</FieldLabel>
-          <FieldDescription>The display name for your team</FieldDescription>
+          <FieldLabel htmlFor="team-name">Workspace Name</FieldLabel>
+          <FieldDescription>The display name for your workspace</FieldDescription>
         </FieldContent>
         <Input id="team-name" placeholder="Acme Inc" />
       </Field>
 
       <Field orientation="responsive">
         <FieldContent>
-          <FieldLabel htmlFor="team-slug">Team Slug/URL</FieldLabel>
+          <FieldLabel htmlFor="team-slug">Workspace URL</FieldLabel>
           <FieldDescription>
             Used in your public feedback page URL
           </FieldDescription>
@@ -48,7 +48,7 @@ export function TeamContent() {
         <FieldContent>
           <FieldLabel htmlFor="invite-email">Invite Members</FieldLabel>
           <FieldDescription>
-            Send an invitation to join your team
+            Send an invitation to join your workspace
           </FieldDescription>
         </FieldContent>
         <div className="flex gap-2">
