@@ -41,7 +41,7 @@ export function NoTeamsState() {
         {/* Create Team Button */}
         <button
           onClick={() => setCreateDialogOpen(true)}
-          className="inline-flex items-center gap-2 bg-authPrimary hover:bg-authPrimaryHover text-white px-6 py-3.5 rounded-lg text-base font-normal transition-colors shadow-lg shadow-authPrimary/20"
+          className="inline-flex items-center gap-2 bg-authPrimary hover:bg-authPrimaryHover text-white px-5 py-2.5 rounded-lg text-base font-normal transition-colors shadow-lg shadow-authPrimary/20"
         >
           <Plus size={18} />
           Create your first workspace
