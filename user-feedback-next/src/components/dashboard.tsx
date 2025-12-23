@@ -21,6 +21,7 @@ import { Id } from "../../convex/_generated/dataModel";
 import { toast } from "sonner";
 import { getSessionId } from "../lib/session";
 import { useTeam } from "@/contexts/TeamContext";
+import { useNavigation } from "@/contexts/NavigationContext";
 import { KanbanBoard, ListView } from "./Kanban";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { FeedbackDialog } from "./FeedbackDialog";
@@ -560,7 +561,7 @@ interface FeedbackItem {
 
 const Dashboard = ({ user }: { user: any }) => {
   const { activeTeam } = useTeam();
-  const [activeTab, setActiveTab] = useState('features');
+  const { activeView, quickFilter, setActiveView } = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [feedbackToEdit, setFeedbackToEdit] = useState<FeedbackItem | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -714,12 +715,31 @@ const Dashboard = ({ user }: { user: any }) => {
 
   // Filter Logic
   const getFilteredItems = () => {
-    if (activeTab === 'roadmap') return roadmapItems || [];
+    if (activeView === 'roadmap') return roadmapItems || [];
 
     let items = feedbackList || [];
-    if (activeTab === 'bugs') items = items.filter(i => i.category === 'Bug');
-    if (activeTab === 'features') items = items.filter(i => i.category === 'Feature' || i.category === 'Improvement');
 
+    // Category filter based on activeView
+    if (activeView === 'bugs') {
+      items = items.filter(i => i.category === 'Bug');
+    } else if (activeView === 'features') {
+      items = items.filter(i => i.category === 'Feature');
+    } else if (activeView === 'improvements') {
+      items = items.filter(i => i.category === 'Improvement');
+    } else if (activeView === 'dashboard' || activeView === 'all') {
+      // Show all feedback
+    }
+    // Note: 'changelog' view is handled separately
+
+    // Apply quick filters
+    if (quickFilter === 'voted') {
+      items = [...items].sort((a, b) => b.votes - a.votes);
+    } else if (quickFilter === 'recent') {
+      items = [...items].sort((a, b) => b._creationTime - a._creationTime);
+    }
+    // Note: 'mine' filter would need user ID tracking
+
+    // Search filter
     if (searchQuery) {
       items = items.filter(i => i.title.toLowerCase().includes(searchQuery.toLowerCase()));
     }
@@ -808,16 +828,16 @@ const Dashboard = ({ user }: { user: any }) => {
 
         {/* Navigation Tabs */}
         <div className="flex overflow-x-auto no-scrollbar border-b border-white/5 mb-8 gap-8">
-          {['features', 'bugs', 'roadmap'].map((tab) => (
+          {(['features', 'bugs', 'roadmap'] as const).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setActiveView(tab)}
               className={`relative pb-4 text-sm font-medium capitalize transition-colors whitespace-nowrap ${
-                activeTab === tab ? 'text-neutral-100' : 'text-neutral-500 hover:text-neutral-300'
+                activeView === tab ? 'text-neutral-100' : 'text-neutral-500 hover:text-neutral-300'
               }`}
             >
               {tab === 'features' ? 'Feature Requests' : tab === 'bugs' ? 'Bug Reports' : 'Roadmap'}
-              {activeTab === tab && (
+              {activeView === tab && (
                 <motion.div
                   layoutId="activeTab"
                   className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500"
@@ -829,7 +849,7 @@ const Dashboard = ({ user }: { user: any }) => {
 
         {/* Tab Content */}
         <div className="min-h-[400px] overflow-hidden">
-          {activeTab === 'roadmap' ? (
+          {activeView === 'roadmap' ? (
             // Roadmap Kanban View - using exact UI component
             kanbanTasks === undefined ? (
               <div className="text-center py-12 w-full">
@@ -882,7 +902,7 @@ const Dashboard = ({ user }: { user: any }) => {
                     List View
                   </TabsTrigger>
                 </TabsList>
-                <KanbanHeaderActions defaultCategory={activeTab === 'bugs' ? 'Bug' : 'Feature'} />
+                <KanbanHeaderActions defaultCategory={activeView === 'bugs' ? 'Bug' : 'Feature'} />
               </div>
               <TabsContent value="board">
                 <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

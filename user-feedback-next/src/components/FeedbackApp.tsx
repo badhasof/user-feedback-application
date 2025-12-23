@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { TeamProvider, useTeam } from "@/contexts/TeamContext";
+import { NavigationProvider } from "@/contexts/NavigationContext";
 import { NoTeamsState } from "./NoTeamsState";
 
 interface UserWithProfile {
@@ -70,7 +71,9 @@ function FeedbackAppContent({ user }: { user: UserWithProfile }) {
 export function FeedbackApp({ user }: { user: UserWithProfile }) {
   return (
     <TeamProvider>
-      <FeedbackAppContent user={user} />
+      <NavigationProvider>
+        <FeedbackAppContent user={user} />
+      </NavigationProvider>
     </TeamProvider>
   );
 }
