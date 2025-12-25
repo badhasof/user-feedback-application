@@ -801,7 +801,7 @@ const Dashboard = ({ user }: { user: any }) => {
   }, [moveTask, teamId]);
 
   return (
-    <div className="flex-1 bg-authBackground font-sans text-textMain overflow-auto">
+    <div className="flex-1 bg-authBackground font-sans text-textMain overflow-y-auto overflow-x-hidden">
       {/* Banner Image */}
       {activeTeam?.bannerUrl && (
         <div className="w-full h-48 md:h-64 overflow-hidden">
@@ -814,7 +814,7 @@ const Dashboard = ({ user }: { user: any }) => {
       )}
 
       {/* Main Content */}
-      <main className="p-6 md:p-8">
+      <main className="p-6 md:p-8 overflow-x-hidden">
         {/* Hero / Intro */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
           <div className="space-y-2 max-w-lg">
@@ -861,7 +861,7 @@ const Dashboard = ({ user }: { user: any }) => {
         </div>
 
         {/* Tab Content */}
-        <div className="min-h-[400px] overflow-hidden">
+        <div className="min-h-[400px]">
           {activeView === 'roadmap' ? (
             // Roadmap Kanban View - using exact UI component
             kanbanTasks === undefined ? (
@@ -877,7 +877,7 @@ const Dashboard = ({ user }: { user: any }) => {
                 <p className="text-sm text-textMuted mt-1">Check back later for updates on our plans</p>
               </div>
             ) : (
-              <Tabs defaultValue="board" className="w-full max-w-full">
+              <Tabs defaultValue="board" className="w-full min-w-0">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 mb-6">
                   <TabsList>
                     <TabsTrigger value="board">
@@ -891,8 +891,8 @@ const Dashboard = ({ user }: { user: any }) => {
                   </TabsList>
                   <KanbanHeaderActions defaultCategory="Feature" />
                 </div>
-                <TabsContent value="board" className="w-full max-w-full">
-                  <div className="pb-2">
+                <TabsContent value="board" className="min-w-0">
+                  <div className="min-w-0 overflow-x-auto pb-2">
                     <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} onRemoveFromKanban={handleRemoveFromKanban} onCreateTask={handleCreateTask} />
                   </div>
                 </TabsContent>
