@@ -103,7 +103,7 @@ export function TeamSwitcher() {
                   />
                 ) : (
                   <div
-                    className={`flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground ${!activeTeam.brandColor ? 'bg-sidebar-primary' : ''}`}
+                    className={`flex aspect-square size-8 items-center justify-center rounded-lg text-white ${!activeTeam.brandColor ? 'bg-authPrimary' : ''}`}
                     style={brandColorStyle}
                   >
                     <ActiveIcon className="size-4" />

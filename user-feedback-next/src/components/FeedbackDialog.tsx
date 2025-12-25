@@ -154,7 +154,7 @@ export function FeedbackDialog({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* Header */}
           <div className="px-8 pt-8 pb-5">
-            <DialogTitle className="text-xl font-normal text-textMain tracking-tight">
+            <DialogTitle className="text-2xl font-light text-textMain tracking-tight">
               {isEditMode ? "Edit post" : "Create a new post"}
             </DialogTitle>
             <p className="text-[15px] text-textMuted mt-1.5 font-normal">
