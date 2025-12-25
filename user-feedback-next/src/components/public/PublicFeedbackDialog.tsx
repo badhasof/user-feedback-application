@@ -180,7 +180,7 @@ export function PublicFeedbackDialog({
               <button
                 type="submit"
                 disabled={form.formState.isSubmitting}
-                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-500 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="brand-button px-5 py-2.5 rounded-lg text-sm font-normal flex items-center gap-2"
               >
                 Submit <CornerDownRight size={16} />
               </button>

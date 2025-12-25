@@ -215,7 +215,7 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
             />
             <button
               onClick={handleAddComment}
-              className="px-4 py-2.5 bg-blue-600 text-white text-[13px] font-normal rounded-lg hover:bg-blue-500 transition-colors"
+              className="brand-button px-4 py-2.5 text-[13px] font-normal rounded-lg"
             >
               Post
             </button>
@@ -497,7 +497,7 @@ const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, des
             className="flex-1 bg-transparent text-sm outline-none h-10 text-neutral-300 placeholder:text-neutral-600"
             onFocus={() => setIsExpanded(true)}
           />
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors">
+          <button className="brand-button px-4 py-2 rounded-lg text-sm font-medium">
             Submit
           </button>
         </>
@@ -526,7 +526,7 @@ const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, des
           />
           <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
             <button onClick={() => setIsExpanded(false)} className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-300 font-medium">Cancel</button>
-            <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 flex items-center gap-2">
+            <button onClick={handleSubmit} className="brand-button px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
               Submit Post <CornerDownRight size={14} />
             </button>
           </div>
@@ -802,14 +802,27 @@ const Dashboard = ({ user }: { user: any }) => {
 
   return (
     <div className="flex-1 bg-[#09090b] font-sans text-neutral-200 overflow-auto">
+      {/* Banner Image */}
+      {activeTeam?.bannerUrl && (
+        <div className="w-full h-48 md:h-64 overflow-hidden">
+          <img
+            src={activeTeam.bannerUrl}
+            alt={`${activeTeam.name} banner`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="p-6 md:p-8">
         {/* Hero / Intro */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
           <div className="space-y-2 max-w-lg">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-100">Help us build a better product.</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-100">
+              {activeTeam?.tagline || "Help us build a better product."}
+            </h2>
             <p className="text-neutral-500 text-sm md:text-base">
-              Vote on existing requests or suggest a new feature. We read every piece of feedback.
+              {activeTeam?.description || "Vote on existing requests or suggest a new feature. We read every piece of feedback."}
             </p>
           </div>
 

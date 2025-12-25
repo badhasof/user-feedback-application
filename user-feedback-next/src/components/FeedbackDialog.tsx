@@ -144,8 +144,8 @@ export function FeedbackDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       {!isControlled && (
         <DialogTrigger asChild>
-          <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20">
-            New <div className="h-4 w-px bg-blue-400/50 mx-1" />
+          <button className="brand-button flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium shadow-lg shadow-blue-900/20">
+            New <div className="h-4 w-px bg-white/30 mx-1" />
             <Plus size={16} />
           </button>
         </DialogTrigger>
@@ -247,7 +247,7 @@ export function FeedbackDialog({
               <button
                 type="submit"
                 disabled={form.formState.isSubmitting || !teamId}
-                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-500 transition-colors flex items-center gap-2 disabled:opacity-50"
+                className="brand-button px-5 py-2.5 rounded-lg text-sm font-normal flex items-center gap-2"
               >
                 {isEditMode ? "Update" : "Submit"} <CornerDownRight size={16} />
               </button>

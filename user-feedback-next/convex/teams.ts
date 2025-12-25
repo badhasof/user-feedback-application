@@ -94,9 +94,20 @@ export const listUserTeams = query({
       memberships.map(async (membership) => {
         const team = await ctx.db.get(membership.teamId);
         if (!team) return null;
+
+        // Resolve image URLs from storage
+        const logoUrl = team.logoStorageId
+          ? await ctx.storage.getUrl(team.logoStorageId)
+          : null;
+        const bannerUrl = team.bannerStorageId
+          ? await ctx.storage.getUrl(team.bannerStorageId)
+          : null;
+
         return {
           ...team,
           role: membership.role,
+          logoUrl,
+          bannerUrl,
         };
       })
     );

@@ -80,6 +80,11 @@ export function TeamSwitcher() {
 
   const ActiveIcon = getIconComponent(activeTeam.iconName);
 
+  // Build style for brand color
+  const brandColorStyle = activeTeam.brandColor
+    ? { backgroundColor: activeTeam.brandColor }
+    : undefined;
+
   return (
     <>
       <SidebarMenu>
@@ -90,9 +95,20 @@ export function TeamSwitcher() {
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <ActiveIcon className="size-4" />
-                </div>
+                {activeTeam.logoUrl ? (
+                  <img
+                    src={activeTeam.logoUrl}
+                    alt={`${activeTeam.name} logo`}
+                    className="size-8 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div
+                    className={`flex aspect-square size-8 items-center justify-center rounded-lg text-sidebar-primary-foreground ${!activeTeam.brandColor ? 'bg-sidebar-primary' : ''}`}
+                    style={brandColorStyle}
+                  >
+                    <ActiveIcon className="size-4" />
+                  </div>
+                )}
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">
                     {activeTeam.name}
@@ -113,15 +129,29 @@ export function TeamSwitcher() {
               </DropdownMenuLabel>
               {teams.map((team, index) => {
                 const TeamIcon = getIconComponent(team.iconName);
+                const teamBrandStyle = team.brandColor
+                  ? { backgroundColor: team.brandColor }
+                  : undefined;
                 return (
                   <DropdownMenuItem
                     key={team._id}
                     onClick={() => setActiveTeam(team)}
                     className="gap-2 p-2"
                   >
-                    <div className="flex size-6 items-center justify-center rounded-sm border">
-                      <TeamIcon className="size-4 shrink-0" />
-                    </div>
+                    {team.logoUrl ? (
+                      <img
+                        src={team.logoUrl}
+                        alt={`${team.name} logo`}
+                        className="size-6 rounded-sm object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={`flex size-6 items-center justify-center rounded-sm ${!team.brandColor ? 'border' : ''}`}
+                        style={teamBrandStyle}
+                      >
+                        <TeamIcon className={`size-4 shrink-0 ${team.brandColor ? 'text-white' : ''}`} />
+                      </div>
+                    )}
                     {team.name}
                     <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
                   </DropdownMenuItem>

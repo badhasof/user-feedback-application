@@ -126,6 +126,41 @@ export function TeamContent({ teamId }: TeamContentProps) {
     }
   }
 
+  const handleResetToDefaults = async () => {
+    setIsSaving(true)
+    try {
+      // Remove images first
+      if (team?.logoUrl) {
+        await removeImage({ teamId, imageType: "logo" })
+      }
+      if (team?.bannerUrl) {
+        await removeImage({ teamId, imageType: "banner" })
+      }
+
+      // Reset all customization fields to defaults
+      await updateTeam({
+        teamId,
+        brandColor: "",
+        tagline: "",
+        description: "",
+      })
+
+      // Reset form state
+      setBrandColor("#3B82F6")
+      setTagline("")
+      setDescription("")
+      setLogoFile(null)
+      setBannerFile(null)
+
+      toast.success("Reset to defaults")
+    } catch (error) {
+      console.error("Failed to reset:", error)
+      toast.error("Failed to reset to defaults")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   if (!team) {
     return (
       <div className="flex items-center justify-center h-40">
@@ -256,10 +291,18 @@ export function TeamContent({ teamId }: TeamContentProps) {
 
         <FieldSeparator />
 
-        {/* Save Button */}
+        {/* Action Buttons */}
         <div className="flex gap-3">
           <Button type="submit" disabled={isSaving}>
             {isSaving ? "Saving..." : "Save Changes"}
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSaving}
+            onClick={handleResetToDefaults}
+          >
+            Reset to Defaults
           </Button>
         </div>
       </FieldGroup>

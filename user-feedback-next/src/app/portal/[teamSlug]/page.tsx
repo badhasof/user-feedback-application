@@ -236,9 +236,9 @@ export default function SubdomainPage({ params }: PageProps) {
                   </div>
                   <button
                     onClick={() => setIsDialogOpen(true)}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded text-sm font-medium transition-colors shadow-lg shadow-blue-900/20"
+                    className="brand-button flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium shadow-lg shadow-blue-900/20"
                   >
-                    New <div className="h-4 w-px bg-blue-400/50 mx-1" />
+                    New <div className="h-4 w-px bg-white/30 mx-1" />
                     <Plus size={16} />
                   </button>
                 </div>

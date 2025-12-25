@@ -10,6 +10,7 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { TeamProvider, useTeam } from "@/contexts/TeamContext";
 import { NavigationProvider } from "@/contexts/NavigationContext";
+import { WorkspaceThemeProvider } from "./WorkspaceThemeProvider";
 import { NoTeamsState } from "./NoTeamsState";
 
 interface UserWithProfile {
@@ -47,24 +48,26 @@ function FeedbackAppContent({ user }: { user: UserWithProfile }) {
 
   // Normal dashboard view
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0f0f10]">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1 text-neutral-400 hover:text-neutral-200 hover:bg-white/5" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 h-4 bg-white/10"
-            />
-            <span className="text-sm font-medium text-neutral-200">
-              Dashboard
-            </span>
-          </div>
-        </header>
-        <Dashboard user={user} />
-      </SidebarInset>
-    </SidebarProvider>
+    <WorkspaceThemeProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset>
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0f0f10]">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1 text-neutral-400 hover:text-neutral-200 hover:bg-white/5" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 h-4 bg-white/10"
+              />
+              <span className="text-sm font-medium text-neutral-200">
+                Dashboard
+              </span>
+            </div>
+          </header>
+          <Dashboard user={user} />
+        </SidebarInset>
+      </SidebarProvider>
+    </WorkspaceThemeProvider>
   );
 }
 
