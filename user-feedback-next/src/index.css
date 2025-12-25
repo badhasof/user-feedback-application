@@ -38,17 +38,17 @@ body {
 
 /* Dark theme auth input fields */
 .auth-input-field {
-  @apply w-full px-4 py-3 rounded-xl bg-[#161616] border border-white/10 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-neutral-200 placeholder:text-neutral-600;
+  @apply w-full px-4 py-3 rounded-xl bg-[#161616] border border-authBorder focus:border-authPrimary/50 focus:ring-2 focus:ring-authPrimary/20 outline-none transition-all text-textMain placeholder:text-textMuted;
 }
 
 /* Dark theme auth buttons */
 .auth-button {
-  @apply w-full px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply w-full px-4 py-3 rounded-xl bg-authPrimary text-white font-semibold hover:bg-authPrimaryHover transition-colors shadow-lg shadow-authPrimary/20 disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
-/* Brand-colored button - uses team's brand color with fallback to blue */
+/* Brand-colored button - uses team's brand color with fallback to auth primary */
 .brand-button {
-  background-color: var(--brand-color, #3B82F6);
+  background-color: var(--brand-color, #10a37f);
   color: white;
   transition: filter 0.2s, opacity 0.2s;
 }

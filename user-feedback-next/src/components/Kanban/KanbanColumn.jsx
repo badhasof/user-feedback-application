@@ -44,33 +44,33 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemove
 
   return (
     <div
-      className="flex flex-col w-[350px] shrink-0 bg-[#161616] rounded-xl p-3 border border-white/5"
+      className="flex flex-col w-[350px] shrink-0 bg-[#1a1a1a] rounded-xl p-3 border border-authBorder"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4 px-1 mt-1">
         <div className="flex items-center gap-3">
           {column.color === "neutral" ? (
             <div className="flex items-center gap-2">
-              <span className="text-[15px] font-semibold text-neutral-100">{column.title}</span>
-              <span className="text-neutral-500 text-sm font-medium">{tasks.length}</span>
+              <span className="text-[15px] font-normal text-textMain">{column.title}</span>
+              <span className="text-textMuted text-sm font-normal">{tasks.length}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span className={cn("px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5", getPillStyle(column.color))}>
+              <span className={cn("px-2.5 py-1 rounded-full text-xs font-normal flex items-center gap-1.5", getPillStyle(column.color))}>
                 {column.color === 'grey' && <div className="w-2 h-2 rounded-full bg-neutral-400" />}
                 {column.color === 'blue' && <div className="w-2 h-2 rounded-full bg-blue-200" />}
                 {column.color === 'green' && <CheckCircle2 size={12} className="text-green-200" />}
                 {column.title}
               </span>
-              <span className="text-neutral-500 text-sm font-medium">{tasks.length}</span>
+              <span className="text-textMuted text-sm font-normal">{tasks.length}</span>
             </div>
           )}
         </div>
-        <div className="flex gap-1 text-neutral-500">
-          <button className="p-1 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"><MoreHorizontal size={18} /></button>
+        <div className="flex gap-1 text-textMuted">
+          <button className="p-1 hover:text-textMain hover:bg-white/5 rounded transition-colors"><MoreHorizontal size={18} /></button>
           <button
             onClick={() => setIsCreating(true)}
-            className="p-1 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
+            className="p-1 hover:text-textMain hover:bg-white/5 rounded transition-colors"
           >
             <Plus size={18} />
           </button>
@@ -101,10 +101,10 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemove
       {/* New Task Button */}
       <button
         onClick={() => setIsCreating(true)}
-        className="group mt-3 flex items-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-neutral-700 hover:border-solid hover:bg-[#202020] hover:border-blue-500/50 transition-all text-left"
+        className="group mt-3 flex items-center gap-2 w-full py-2.5 px-3 rounded-lg border border-dashed border-authBorder hover:border-solid hover:bg-[#1f1f1f] hover:border-authPrimary/50 transition-all text-left"
       >
-        <Plus size={16} className="text-blue-500 group-hover:text-blue-400" />
-        <span className="text-sm font-medium text-neutral-400 group-hover:text-neutral-300">New task</span>
+        <Plus size={16} className="text-authPrimary group-hover:text-authPrimary" />
+        <span className="text-sm font-normal text-textMuted group-hover:text-textMain">New task</span>
       </button>
     </div>
   );

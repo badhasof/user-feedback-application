@@ -20,10 +20,10 @@ export function PublicHeader({ teamName, teamIcon, logoUrl, brandColor }: Public
     : undefined;
 
   // Default gradient classes (used when no brandColor)
-  const defaultGradient = !brandColor ? "bg-gradient-to-br from-blue-500 to-indigo-600" : "";
+  const defaultGradient = !brandColor ? "bg-gradient-to-br from-authPrimary to-authPrimaryHover" : "";
 
   return (
-    <header className="border-b border-white/5 bg-[#09090b]">
+    <header className="border-b border-authBorder bg-authBackground">
       <div className="max-w-5xl mx-auto px-6 py-4 flex items-center">
         <div className="flex items-center gap-3">
           {logoUrl ? (
@@ -34,15 +34,15 @@ export function PublicHeader({ teamName, teamIcon, logoUrl, brandColor }: Public
             />
           ) : (
             <div
-              className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-lg ${defaultGradient}`}
+              className={`w-10 h-10 rounded-lg flex items-center justify-center text-white font-normal text-lg ${defaultGradient}`}
               style={logoStyle}
             >
               {getIconDisplay(teamIcon)}
             </div>
           )}
           <div>
-            <h1 className="text-lg font-semibold text-neutral-100">{teamName}</h1>
-            <p className="text-xs text-neutral-500">Feedback Portal</p>
+            <h1 className="text-lg font-normal text-textMain">{teamName}</h1>
+            <p className="text-xs text-textMuted">Feedback Portal</p>
           </div>
         </div>
       </div>

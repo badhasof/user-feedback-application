@@ -60,10 +60,10 @@ export function TeamSwitcher() {
                 <Plus className="size-4 text-neutral-500" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold text-neutral-400">
+                <span className="truncate font-normal text-textMuted">
                   Create a workspace
                 </span>
-                <span className="truncate text-xs text-neutral-500">
+                <span className="truncate text-xs text-textMuted">
                   Get started
                 </span>
               </div>
@@ -110,7 +110,7 @@ export function TeamSwitcher() {
                   </div>
                 )}
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
+                  <span className="truncate font-normal">
                     {activeTeam.name}
                   </span>
                   <span className="truncate text-xs">{activeTeam.plan}</span>

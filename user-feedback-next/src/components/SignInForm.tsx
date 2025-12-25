@@ -14,7 +14,7 @@ export function SignInForm() {
         {/* Logo */}
         <div className="flex justify-center mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-900/30">
+            <div className="w-10 h-10 bg-authPrimary rounded-xl flex items-center justify-center text-white shadow-lg shadow-authPrimary/30">
               <span className="font-bold text-lg tracking-tighter">Ac</span>
             </div>
             <span className="text-xl font-bold text-neutral-100">Acme Feedback</span>
@@ -69,7 +69,7 @@ export function SignInForm() {
                 autoComplete="email"
                 autoCorrect="off"
                 disabled={submitting}
-                className="w-full px-4 py-3 rounded-xl bg-[#1E1E1E] border border-white/10 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-neutral-200 placeholder:text-neutral-600 disabled:opacity-50"
+                className="w-full px-4 py-3 rounded-xl bg-[#1f1f1f] border border-authBorder focus:border-authPrimary/50 focus:ring-2 focus:ring-authPrimary/20 outline-none transition-all text-textMain placeholder:text-textMuted disabled:opacity-50"
                 required
               />
             </div>
@@ -87,14 +87,14 @@ export function SignInForm() {
                 autoComplete={flow === "signIn" ? "current-password" : "new-password"}
                 autoCorrect="off"
                 disabled={submitting}
-                className="w-full px-4 py-3 rounded-xl bg-[#1E1E1E] border border-white/10 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all text-neutral-200 placeholder:text-neutral-600 disabled:opacity-50"
+                className="w-full px-4 py-3 rounded-xl bg-[#1f1f1f] border border-authBorder focus:border-authPrimary/50 focus:ring-2 focus:ring-authPrimary/20 outline-none transition-all text-textMain placeholder:text-textMuted disabled:opacity-50"
                 required
               />
             </div>
 
             <button
               disabled={submitting}
-              className="w-full px-4 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-500 transition-colors shadow-lg shadow-blue-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              className="w-full px-4 py-3 rounded-xl bg-authPrimary text-white font-normal hover:bg-authPrimaryHover transition-colors shadow-lg shadow-authPrimary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
               type="submit"
             >
               {submitting && (
@@ -175,7 +175,7 @@ export function SignInForm() {
           <p className="mt-6 text-center text-sm text-neutral-500">
             <button
               type="button"
-              className="text-blue-400 hover:text-blue-300 underline underline-offset-4 transition-colors"
+              className="text-authPrimary hover:text-authPrimaryHover underline underline-offset-4 transition-colors"
               onClick={() => setFlow(flow === "signIn" ? "signUp" : "signIn")}
             >
               {flow === "signIn"

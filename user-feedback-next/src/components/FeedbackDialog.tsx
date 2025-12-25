@@ -144,20 +144,20 @@ export function FeedbackDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       {!isControlled && (
         <DialogTrigger asChild>
-          <button className="brand-button flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium shadow-lg shadow-blue-900/20">
+          <button className="brand-button flex items-center gap-2 px-3 py-1.5 rounded text-sm font-normal shadow-lg shadow-authPrimary/20">
             New <div className="h-4 w-px bg-white/30 mx-1" />
             <Plus size={16} />
           </button>
         </DialogTrigger>
       )}
-      <DialogContent className="sm:max-w-[540px] bg-[#161616] border-white/5 p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[540px] bg-[#1a1a1a] border-authBorder p-0 gap-0 overflow-hidden">
         <form onSubmit={form.handleSubmit(onSubmit)}>
           {/* Header */}
           <div className="px-8 pt-8 pb-5">
-            <DialogTitle className="text-xl font-normal text-neutral-100 tracking-tight">
+            <DialogTitle className="text-xl font-normal text-textMain tracking-tight">
               {isEditMode ? "Edit post" : "Create a new post"}
             </DialogTitle>
-            <p className="text-[15px] text-neutral-500 mt-1.5 font-normal">
+            <p className="text-[15px] text-textMuted mt-1.5 font-normal">
               {isEditMode ? "Update your feedback details" : "Share feedback, report bugs, or request features"}
             </p>
           </div>
@@ -176,7 +176,7 @@ export function FeedbackDialog({
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-normal transition-all ${
                       isSelected
                         ? `${cat.bg} ${cat.color} ring-1 ring-current/20`
-                        : "bg-[#1E1E1E] text-neutral-500 hover:text-neutral-300 hover:bg-[#252525]"
+                        : "bg-[#1f1f1f] text-textMuted hover:text-textMain hover:bg-[#252525]"
                     }`}
                   >
                     <Icon size={16} />
@@ -194,7 +194,7 @@ export function FeedbackDialog({
               <input
                 {...form.register("title")}
                 placeholder="Short, descriptive title"
-                className="w-full text-[19px] font-normal placeholder:text-neutral-600 outline-none border-b border-white/5 pb-3 bg-transparent text-neutral-200 focus:border-blue-500/30 transition-colors leading-snug"
+                className="w-full text-[19px] font-normal placeholder:text-textMuted outline-none border-b border-authBorder pb-3 bg-transparent text-textMain focus:border-authPrimary/30 transition-colors leading-snug"
               />
               {errors.title && (
                 <p className="text-sm text-red-400 mt-2">{errors.title.message}</p>
@@ -213,7 +213,7 @@ export function FeedbackDialog({
                     ? "Describe the feature you'd like to see..."
                     : "Share your thoughts..."
                 }
-                className="w-full text-[16px] text-neutral-300 placeholder:text-neutral-600 outline-none resize-none bg-transparent leading-relaxed font-normal"
+                className="w-full text-[16px] text-textMain placeholder:text-textMuted outline-none resize-none bg-transparent leading-relaxed font-normal"
               />
               {errors.description && (
                 <p className="text-sm text-red-400 mt-2">{errors.description.message}</p>
@@ -222,15 +222,15 @@ export function FeedbackDialog({
           </div>
 
           {/* Footer */}
-          <div className="px-8 py-5 mt-3 border-t border-white/5 flex items-center justify-between">
+          <div className="px-8 py-5 mt-3 border-t border-authBorder flex items-center justify-between">
             {!isEditMode ? (
               <label className="flex items-center gap-2.5 cursor-pointer">
                 <input
                   type="checkbox"
                   {...form.register("isAnonymous")}
-                  className="w-4 h-4 rounded border-neutral-700 bg-[#1E1E1E] text-blue-600 focus:ring-0 focus:ring-offset-0"
+                  className="w-4 h-4 rounded border-authBorder bg-[#1f1f1f] text-authPrimary focus:ring-0 focus:ring-offset-0"
                 />
-                <span className="text-sm text-neutral-500">Post anonymously</span>
+                <span className="text-sm text-textMuted">Post anonymously</span>
               </label>
             ) : (
               <div />
@@ -240,7 +240,7 @@ export function FeedbackDialog({
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="px-5 py-2.5 text-sm text-neutral-500 hover:text-neutral-300 font-normal transition-colors"
+                className="px-5 py-2.5 text-sm text-textMuted hover:text-textMain font-normal transition-colors"
               >
                 Cancel
               </button>

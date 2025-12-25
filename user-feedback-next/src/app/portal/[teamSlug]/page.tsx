@@ -58,10 +58,10 @@ export default function SubdomainPage({ params }: PageProps) {
   // Loading state
   if (team === undefined) {
     return (
-      <div className="min-h-screen bg-[#09090b] flex items-center justify-center">
+      <div className="min-h-screen bg-authBackground flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-neutral-700 border-t-blue-500 mx-auto mb-4"></div>
-          <p className="text-neutral-500">Loading feedback portal...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-authBorder border-t-authPrimary mx-auto mb-4"></div>
+          <p className="text-textMuted">Loading feedback portal...</p>
         </div>
       </div>
     );
@@ -131,7 +131,7 @@ export default function SubdomainPage({ params }: PageProps) {
 
   return (
     <PortalThemeProvider brandColor={team.brandColor}>
-      <div className="min-h-screen bg-[#09090b] font-sans text-neutral-200">
+      <div className="min-h-screen bg-authBackground font-sans text-textMain">
         <Toaster position="top-right" theme="dark" />
 
         <PublicHeader
@@ -156,42 +156,42 @@ export default function SubdomainPage({ params }: PageProps) {
           {/* Hero / Intro */}
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
             <div className="space-y-2 max-w-lg">
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-100">
+              <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white">
                 {team.tagline || "Help us build a better product."}
               </h2>
-              <p className="text-neutral-500 text-sm md:text-base">
+              <p className="text-textMuted text-sm md:text-base">
                 {team.description || "Vote on existing requests or suggest a new feature. We read every piece of feedback."}
               </p>
             </div>
 
             {/* Search Bar */}
             <div className="w-full md:w-64 relative group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-neutral-400 transition-colors" size={16} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-textMain transition-colors" size={16} />
               <input
                 type="text"
                 placeholder="Search feedback..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-[#161616] border border-white/5 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all text-neutral-200 placeholder:text-neutral-600"
+                className="w-full bg-[#1a1a1a] border border-authBorder rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-authPrimary/20 focus:border-authPrimary/30 transition-all text-textMain placeholder:text-textMuted"
               />
             </div>
           </div>
 
         {/* Navigation Tabs */}
-        <div className="flex overflow-x-auto no-scrollbar border-b border-white/5 mb-8 gap-8">
+        <div className="flex overflow-x-auto no-scrollbar border-b border-authBorder mb-8 gap-8">
           {['features', 'bugs', 'roadmap'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`relative pb-4 text-sm font-medium capitalize transition-colors whitespace-nowrap ${
-                activeTab === tab ? 'text-neutral-100' : 'text-neutral-500 hover:text-neutral-300'
+              className={`relative pb-4 text-sm font-normal capitalize transition-colors whitespace-nowrap ${
+                activeTab === tab ? 'text-textMain' : 'text-textMuted hover:text-textMain'
               }`}
             >
               {tab === 'features' ? 'Feature Requests' : tab === 'bugs' ? 'Bug Reports' : 'Roadmap'}
               {activeTab === tab && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500"
+                  className="absolute bottom-0 left-0 w-full h-0.5 bg-authPrimary"
                 />
               )}
             </button>
@@ -204,7 +204,7 @@ export default function SubdomainPage({ params }: PageProps) {
             // Roadmap View
             roadmapItems === undefined ? (
               <div className="text-center py-12 w-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-authPrimary mx-auto"></div>
               </div>
             ) : (
               <PublicRoadmapView
@@ -236,7 +236,7 @@ export default function SubdomainPage({ params }: PageProps) {
                   </div>
                   <button
                     onClick={() => setIsDialogOpen(true)}
-                    className="brand-button flex items-center gap-2 px-3 py-1.5 rounded text-sm font-medium shadow-lg shadow-blue-900/20"
+                    className="brand-button flex items-center gap-2 px-3 py-1.5 rounded text-sm font-normal shadow-lg shadow-authPrimary/20"
                   >
                     New <div className="h-4 w-px bg-white/30 mx-1" />
                     <Plus size={16} />
@@ -248,10 +248,10 @@ export default function SubdomainPage({ params }: PageProps) {
                   <AnimatePresence>
                     {feedbackList === undefined ? (
                       <div className="text-center py-12 col-span-full">
-                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-authPrimary mx-auto"></div>
                       </div>
                     ) : filteredItems.length === 0 ? (
-                      <div className="py-20 text-center text-neutral-500 col-span-full">
+                      <div className="py-20 text-center text-textMuted col-span-full">
                         <p>No posts found matching your criteria.</p>
                       </div>
                     ) : (
@@ -274,10 +274,10 @@ export default function SubdomainPage({ params }: PageProps) {
                   <AnimatePresence>
                     {feedbackList === undefined ? (
                       <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-authPrimary mx-auto"></div>
                       </div>
                     ) : filteredItems.length === 0 ? (
-                      <div className="py-20 text-center text-neutral-500">
+                      <div className="py-20 text-center text-textMuted">
                         <p>No posts found matching your criteria.</p>
                       </div>
                     ) : (
