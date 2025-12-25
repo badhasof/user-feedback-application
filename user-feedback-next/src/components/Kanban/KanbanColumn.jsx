@@ -44,7 +44,7 @@ export const KanbanColumn = memo(function KanbanColumn({ column, tasks, onRemove
 
   return (
     <div
-      className="flex flex-col w-[350px] shrink-0 bg-[#1a1a1a] rounded-xl p-3 border border-authBorder"
+      className="flex flex-col w-[350px] shrink-0 bg-[#171717] rounded-xl p-3 border border-authBorder"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4 px-1 mt-1">

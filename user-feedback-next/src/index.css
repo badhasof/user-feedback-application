@@ -97,7 +97,7 @@ body {
 @layer base {
   :root {
     /* Dark theme with neutral grays and blue accents */
-    --sidebar-background: 0 0% 6%;
+    --sidebar-background: 0 0% 8%;
     --sidebar-foreground: 0 0% 96%;
     --sidebar-primary: 217 91% 60%;
     --sidebar-primary-foreground: 0 0% 100%;

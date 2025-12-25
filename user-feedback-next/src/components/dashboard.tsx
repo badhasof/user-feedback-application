@@ -283,7 +283,7 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
             </div>
 
             {/* Title */}
-            <h3 className="text-[17px] leading-snug font-normal text-white group-hover:text-authPrimary transition-colors mb-2">
+            <h3 className="text-[17px] leading-snug font-normal text-white mb-2">
               {item.title}
             </h3>
 
@@ -345,7 +345,7 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
           <div className="flex-1 flex flex-col gap-1">
             {/* Title row with tags */}
             <div className="flex items-start justify-between gap-3">
-              <h3 className="text-[19px] leading-snug font-normal text-white group-hover:text-authPrimary transition-colors mt-0.5">
+              <h3 className="text-[19px] leading-snug font-normal text-white mt-0.5">
                 {item.title}
               </h3>
               <DropdownMenu>
