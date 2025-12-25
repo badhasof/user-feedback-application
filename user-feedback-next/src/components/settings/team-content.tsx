@@ -20,10 +20,11 @@ interface SettingRowProps {
   description: string
   children: React.ReactNode
   isLast?: boolean
-  orientation?: "horizontal" | "vertical"
+  horizontal?: boolean
+  fullWidth?: boolean
 }
 
-function SettingRow({ label, description, children, isLast, orientation = "horizontal" }: SettingRowProps) {
+function SettingRow({ label, description, children, isLast, horizontal, fullWidth }: SettingRowProps) {
   return (
     <div
       className={cn(
@@ -31,18 +32,23 @@ function SettingRow({ label, description, children, isLast, orientation = "horiz
         !isLast && "border-b border-authBorder"
       )}
     >
-      <div className={cn(
-        "w-full",
-        orientation === "horizontal"
-          ? "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-          : "space-y-3"
-      )}>
-        <div className="flex-1">
-          <span className="text-textMain font-medium">{label}</span>
-          <div className="text-xs text-textMuted mt-1">{description}</div>
+      {horizontal ? (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex-1">
+            <span className="text-textMain font-medium">{label}</span>
+            <div className="text-xs text-textMuted mt-0.5">{description}</div>
+          </div>
+          <div>{children}</div>
         </div>
-        <div className={orientation === "horizontal" ? "sm:w-[260px]" : ""}>{children}</div>
-      </div>
+      ) : (
+        <div className="w-full space-y-2">
+          <div>
+            <span className="text-textMain font-medium">{label}</span>
+            <div className="text-xs text-textMuted mt-0.5">{description}</div>
+          </div>
+          <div className={fullWidth ? "" : "w-72"}>{children}</div>
+        </div>
+      )}
     </div>
   )
 }
@@ -212,21 +218,19 @@ export function TeamContent({ teamId }: TeamContentProps) {
       </SettingRow>
 
       <SettingRow
-        label="Brand Primary Color"
-        description="Primary brand color for your public feedback portal"
-        orientation="vertical"
+        label="Brand Color"
+        description="Primary color for your public feedback portal"
+        horizontal
       >
-        <div className="mt-2">
-          <ColorPicker value={brandColor} onChange={setBrandColor} />
-        </div>
+        <ColorPicker value={brandColor} onChange={setBrandColor} />
       </SettingRow>
 
       <SettingRow
         label="Logo"
-        description="Your company logo displayed in the portal header (square, max 2MB)"
-        orientation="vertical"
+        description="Square logo for portal header (max 2MB)"
+        fullWidth
       >
-        <div className="w-32 mt-2">
+        <div className="w-32">
           <ImageUpload
             value={team.logoUrl}
             onChange={setLogoFile}
@@ -239,11 +243,11 @@ export function TeamContent({ teamId }: TeamContentProps) {
       </SettingRow>
 
       <SettingRow
-        label="Banner Image"
-        description="Hero banner at the top of your portal (16:9 recommended, max 5MB)"
-        orientation="vertical"
+        label="Banner"
+        description="Hero image for your portal (16:9, max 5MB)"
+        fullWidth
       >
-        <div className="max-w-md mt-2">
+        <div className="max-w-xs">
           <ImageUpload
             value={team.bannerUrl}
             onChange={setBannerFile}
@@ -258,6 +262,7 @@ export function TeamContent({ teamId }: TeamContentProps) {
       <SettingRow
         label="Tagline"
         description="Short headline shown in the portal hero section"
+        fullWidth
       >
         <Input
           id="tagline"
@@ -265,15 +270,15 @@ export function TeamContent({ teamId }: TeamContentProps) {
           onChange={(e) => setTagline(e.target.value)}
           placeholder="Help us build a better product"
           maxLength={100}
-          className="bg-white/5 border-authBorder text-textMain placeholder:text-textMuted"
+          className="bg-white/5 border-authBorder text-textMain placeholder:text-textMuted max-w-md"
         />
       </SettingRow>
 
       <SettingRow
         label="Description"
         description="Longer description text below the tagline"
-        orientation="vertical"
         isLast
+        fullWidth
       >
         <Textarea
           id="description"
@@ -282,7 +287,7 @@ export function TeamContent({ teamId }: TeamContentProps) {
           placeholder="Vote on existing requests or suggest a new feature. We read every piece of feedback."
           rows={3}
           maxLength={500}
-          className="bg-white/5 border-authBorder text-textMain placeholder:text-textMuted mt-2"
+          className="bg-white/5 border-authBorder text-textMain placeholder:text-textMuted max-w-md"
         />
       </SettingRow>
 

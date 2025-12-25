@@ -10,25 +10,34 @@ interface SettingRowProps {
   description: string
   children: React.ReactNode
   isLast?: boolean
+  horizontal?: boolean
 }
 
-function SettingRow({ label, description, children, isLast }: SettingRowProps) {
+function SettingRow({ label, description, children, isLast, horizontal }: SettingRowProps) {
   return (
     <div
       className={cn(
-        "flex min-h-[70px] items-center py-4",
+        "py-4",
         !isLast && "border-b border-authBorder"
       )}
     >
-      <div className="w-full">
+      {horizontal ? (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex-1">
             <span className="text-textMain font-medium">{label}</span>
-            <div className="text-xs text-textMuted mt-1">{description}</div>
+            <div className="text-xs text-textMuted mt-0.5">{description}</div>
           </div>
-          <div className="sm:w-[260px]">{children}</div>
+          <div>{children}</div>
         </div>
-      </div>
+      ) : (
+        <div className="w-full space-y-2">
+          <div>
+            <span className="text-textMain font-medium">{label}</span>
+            <div className="text-xs text-textMuted mt-0.5">{description}</div>
+          </div>
+          <div className="w-72">{children}</div>
+        </div>
+      )}
     </div>
   )
 }
@@ -78,10 +87,11 @@ export function AccountContent() {
         label="Password"
         description="Change your account password"
         isLast
+        horizontal
       >
         <Button
           variant="outline"
-          className="w-full sm:w-auto border-authBorder text-textMain hover:bg-white/5"
+          className="border-authBorder text-textMain hover:bg-white/5"
         >
           Change Password
         </Button>
