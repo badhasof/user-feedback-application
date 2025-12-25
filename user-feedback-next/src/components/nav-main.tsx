@@ -1,5 +1,6 @@
 "use client"
 
+import { useState } from "react"
 import { ChevronRight, type LucideIcon } from "lucide-react"
 import { toast } from "sonner"
 
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useNavigation, type View } from "@/contexts/NavigationContext"
 import { useTeam } from "@/contexts/TeamContext"
+import { SettingsDialog } from "@/components/settings-dialog"
 
 // Map nav item titles to views
 const viewMap: Record<string, View> = {
@@ -47,6 +49,7 @@ export function NavMain({
 }) {
   const { activeView, setActiveView, setQuickFilter } = useNavigation()
   const { activeTeam } = useTeam()
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   const handleNavClick = (title: string) => {
     // Handle special cases
@@ -59,7 +62,8 @@ export function NavMain({
       return
     }
     if (title === "Customize") {
-      toast("Portal customization coming soon!", { icon: "🎨" })
+      // Open settings dialog to team/workspace section
+      setSettingsOpen(true)
       return
     }
     if (title === "Changelog") {
@@ -82,61 +86,68 @@ export function NavMain({
   }
 
   return (
-    <SidebarGroup>
-      <SidebarMenu>
-        {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            asChild
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-          >
-            <SidebarMenuItem>
-              {item.items && item.items.length > 0 ? (
-                // Has sub-items: show collapsible
-                <>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isSubItemActive(subItem.title)}
-                          >
-                            <button
-                              onClick={() => handleNavClick(subItem.title)}
-                              className="w-full text-left"
+    <>
+      <SidebarGroup>
+        <SidebarMenu>
+          {items.map((item) => (
+            <Collapsible
+              key={item.title}
+              asChild
+              defaultOpen={item.isActive}
+              className="group/collapsible"
+            >
+              <SidebarMenuItem>
+                {item.items && item.items.length > 0 ? (
+                  // Has sub-items: show collapsible
+                  <>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton tooltip={item.title}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                        <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        {item.items.map((subItem) => (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={isSubItemActive(subItem.title)}
                             >
-                              <span>{subItem.title}</span>
-                            </button>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </>
-              ) : (
-                // No sub-items: direct navigation
-                <SidebarMenuButton
-                  tooltip={item.title}
-                  isActive={viewMap[item.title] === activeView}
-                  onClick={() => handleNavClick(item.title)}
-                >
-                  {item.icon && <item.icon />}
-                  <span>{item.title}</span>
-                </SidebarMenuButton>
-              )}
-            </SidebarMenuItem>
-          </Collapsible>
-        ))}
-      </SidebarMenu>
-    </SidebarGroup>
+                              <button
+                                onClick={() => handleNavClick(subItem.title)}
+                                className="w-full text-left"
+                              >
+                                <span>{subItem.title}</span>
+                              </button>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </>
+                ) : (
+                  // No sub-items: direct navigation
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={viewMap[item.title] === activeView}
+                    onClick={() => handleNavClick(item.title)}
+                  >
+                    {item.icon && <item.icon />}
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                )}
+              </SidebarMenuItem>
+            </Collapsible>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+      <SettingsDialog
+        open={settingsOpen}
+        onOpenChange={setSettingsOpen}
+        defaultSection="team"
+      />
+    </>
   )
 }

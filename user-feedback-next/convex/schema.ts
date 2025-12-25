@@ -32,6 +32,10 @@ const applicationTables = {
     plan: v.string(),
     iconName: v.string(),
     brandColor: v.optional(v.string()),
+    logoStorageId: v.optional(v.id("_storage")),
+    bannerStorageId: v.optional(v.id("_storage")),
+    tagline: v.optional(v.string()),
+    description: v.optional(v.string()),
     ownerId: v.id("users"),
     createdAt: v.number(),
   })

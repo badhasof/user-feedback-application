@@ -15,6 +15,7 @@ import { PublicHeader } from "@/components/public/PublicHeader";
 import { PublicFeedbackCard } from "@/components/public/PublicFeedbackCard";
 import { PublicFeedbackDialog } from "@/components/public/PublicFeedbackDialog";
 import { PublicRoadmapView } from "@/components/public/PublicRoadmapView";
+import { PortalThemeProvider } from "@/components/public/PortalThemeProvider";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface PageProps {
@@ -129,38 +130,52 @@ export default function SubdomainPage({ params }: PageProps) {
   const filteredItems = getFilteredItems();
 
   return (
-    <div className="min-h-screen bg-[#09090b] font-sans text-neutral-200">
-      <Toaster position="top-right" theme="dark" />
+    <PortalThemeProvider brandColor={team.brandColor}>
+      <div className="min-h-screen bg-[#09090b] font-sans text-neutral-200">
+        <Toaster position="top-right" theme="dark" />
 
-      <PublicHeader
-        teamName={team.name}
-        teamIcon={team.iconName}
-      />
+        <PublicHeader
+          teamName={team.name}
+          teamIcon={team.iconName}
+          logoUrl={team.logoUrl}
+          brandColor={team.brandColor}
+        />
 
-      <main className="max-w-5xl mx-auto px-6 py-8">
-        {/* Hero / Intro */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
-          <div className="space-y-2 max-w-lg">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-100">
-              Help us build a better product.
-            </h2>
-            <p className="text-neutral-500 text-sm md:text-base">
-              Vote on existing requests or suggest a new feature. We read every piece of feedback.
-            </p>
-          </div>
-
-          {/* Search Bar */}
-          <div className="w-full md:w-64 relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-neutral-400 transition-colors" size={16} />
-            <input
-              type="text"
-              placeholder="Search feedback..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#161616] border border-white/5 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all text-neutral-200 placeholder:text-neutral-600"
+        {/* Banner Image */}
+        {team.bannerUrl && (
+          <div className="w-full h-48 md:h-64 overflow-hidden">
+            <img
+              src={team.bannerUrl}
+              alt={`${team.name} banner`}
+              className="w-full h-full object-cover"
             />
           </div>
-        </div>
+        )}
+
+        <main className="max-w-5xl mx-auto px-6 py-8">
+          {/* Hero / Intro */}
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 gap-6">
+            <div className="space-y-2 max-w-lg">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-100">
+                {team.tagline || "Help us build a better product."}
+              </h2>
+              <p className="text-neutral-500 text-sm md:text-base">
+                {team.description || "Vote on existing requests or suggest a new feature. We read every piece of feedback."}
+              </p>
+            </div>
+
+            {/* Search Bar */}
+            <div className="w-full md:w-64 relative group">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-neutral-400 transition-colors" size={16} />
+              <input
+                type="text"
+                placeholder="Search feedback..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-[#161616] border border-white/5 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all text-neutral-200 placeholder:text-neutral-600"
+              />
+            </div>
+          </div>
 
         {/* Navigation Tabs */}
         <div className="flex overflow-x-auto no-scrollbar border-b border-white/5 mb-8 gap-8">
@@ -285,15 +300,16 @@ export default function SubdomainPage({ params }: PageProps) {
         </div>
       </main>
 
-      {/* Feedback Dialog */}
-      {teamId && (
-        <PublicFeedbackDialog
-          teamId={teamId}
-          open={isDialogOpen}
-          onOpenChange={setIsDialogOpen}
-          defaultCategory={activeTab === 'bugs' ? 'Bug' : 'Feature'}
-        />
-      )}
-    </div>
+        {/* Feedback Dialog */}
+        {teamId && (
+          <PublicFeedbackDialog
+            teamId={teamId}
+            open={isDialogOpen}
+            onOpenChange={setIsDialogOpen}
+            defaultCategory={activeTab === 'bugs' ? 'Bug' : 'Feature'}
+          />
+        )}
+      </div>
+    </PortalThemeProvider>
   );
 }

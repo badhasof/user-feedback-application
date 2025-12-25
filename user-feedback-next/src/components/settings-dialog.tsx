@@ -36,6 +36,7 @@ import { AccountContent } from "@/components/settings/account-content"
 import { BillingContent } from "@/components/settings/billing-content"
 import { NotificationsContent } from "@/components/settings/notifications-content"
 import { TeamContent } from "@/components/settings/team-content"
+import { useTeam } from "@/contexts/TeamContext"
 
 export type SettingsSection = "account" | "billing" | "notifications" | "team"
 
@@ -46,13 +47,6 @@ const navItems = [
   { id: "team" as const, name: "Workspace", icon: Users },
 ]
 
-const sectionContent: Record<SettingsSection, React.ReactNode> = {
-  account: <AccountContent />,
-  billing: <BillingContent />,
-  notifications: <NotificationsContent />,
-  team: <TeamContent />,
-}
-
 interface SettingsDialogProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -62,6 +56,7 @@ interface SettingsDialogProps {
 export function SettingsDialog({ open, onOpenChange, defaultSection = "account" }: SettingsDialogProps) {
   const [internalOpen, setInternalOpen] = React.useState(false)
   const [activeSection, setActiveSection] = React.useState<SettingsSection>(defaultSection)
+  const { activeTeam } = useTeam()
 
   const isControlled = open !== undefined
   const isOpen = isControlled ? open : internalOpen
@@ -75,6 +70,22 @@ export function SettingsDialog({ open, onOpenChange, defaultSection = "account" 
   }, [open, defaultSection])
 
   const activeNavItem = navItems.find(item => item.id === activeSection)
+
+  // Render content based on active section
+  const renderContent = () => {
+    switch (activeSection) {
+      case "account":
+        return <AccountContent />
+      case "billing":
+        return <BillingContent />
+      case "notifications":
+        return <NotificationsContent />
+      case "team":
+        return activeTeam ? <TeamContent teamId={activeTeam._id} /> : null
+      default:
+        return null
+    }
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -123,7 +134,7 @@ export function SettingsDialog({ open, onOpenChange, defaultSection = "account" 
             </header>
             <div className="flex flex-1 flex-col gap-4 overflow-y-auto p-4 pt-0">
               <div className="w-full max-w-4xl">
-                {sectionContent[activeSection]}
+                {renderContent()}
               </div>
             </div>
           </main>
