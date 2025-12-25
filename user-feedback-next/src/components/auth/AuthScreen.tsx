@@ -21,41 +21,59 @@ const AuthScreen: React.FC = () => {
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const toggleMode = () => {
     setMode((prev) => (prev === 'signin' ? 'signup' : 'signin'));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const startResendCooldown = () => {
+    setResendCooldown(60);
+    const interval = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
 
-    // For signup, show OTP screen first
-    if (mode === 'signup') {
-      setStep('otp');
-      setSubmitting(false);
-      return;
-    }
-
-    // For signin, proceed directly
     const formData = new FormData();
     formData.set("email", email);
     formData.set("password", password);
-    formData.set("flow", "signIn");
+    formData.set("flow", mode === 'signin' ? "signIn" : "signUp");
 
-    void signIn("password", formData).catch((error) => {
-      let toastTitle = "";
-      if (error.message.includes("Invalid password")) {
-        toastTitle = "Invalid password. Please try again.";
+    try {
+      await signIn("password", formData);
+      // For sign-in: user is now authenticated
+      // For sign-up with verify: this triggers OTP email, then we show OTP screen
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      if (mode === 'signup') {
+        // After signUp attempt, show OTP screen (OTP email was likely triggered)
+        setStep('otp');
+        startResendCooldown();
       } else {
-        toastTitle = "Could not sign in, did you mean to sign up?";
+        // Handle sign-in errors
+        if (errorMessage.includes("Invalid password")) {
+          toast.error("Invalid password. Please try again.");
+        } else {
+          toast.error("Could not sign in, did you mean to sign up?");
+        }
       }
-      toast.error(toastTitle);
+    } finally {
       setSubmitting(false);
-    });
+    }
   };
 
-  const handleOTPVerify = (e: React.FormEvent) => {
+  const handleOTPVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 6) {
       toast.error("Please enter all 6 digits");
@@ -64,23 +82,47 @@ const AuthScreen: React.FC = () => {
 
     setSubmitting(true);
 
-    // For now, accept any 6 digits and proceed with signup
+    const formData = new FormData();
+    formData.set("email", email);
+    formData.set("code", otp);
+    formData.set("flow", "email-verification");
+
+    try {
+      await signIn("password", formData);
+      toast.success("Email verified successfully!");
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      if (errorMessage.includes("expired")) {
+        toast.error("Code expired. Please request a new one.");
+      } else {
+        toast.error("Invalid code. Please try again.");
+      }
+      setOtp('');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0) return;
+
+    setSubmitting(true);
+
     const formData = new FormData();
     formData.set("email", email);
     formData.set("password", password);
     formData.set("flow", "signUp");
 
-    void signIn("password", formData).catch((error) => {
-      let toastTitle = "";
-      if (error.message.includes("Invalid password")) {
-        toastTitle = "Invalid password. Please try again.";
-      } else {
-        toastTitle = "Could not sign up, did you mean to sign in?";
-      }
-      toast.error(toastTitle);
-      setSubmitting(false);
-      setStep('credentials');
-    });
+    try {
+      await signIn("password", formData);
+    } catch {
+      // Expected - account may exist, but OTP is resent
+    }
+
+    toast.success("Verification code resent!");
+    startResendCooldown();
+    setSubmitting(false);
   };
 
   const handleGoogleAuth = () => {
@@ -168,10 +210,11 @@ const AuthScreen: React.FC = () => {
               Didn't receive the code?{' '}
               <button
                 type="button"
-                className="text-authPrimary hover:text-authPrimaryHover transition-colors font-medium"
-                onClick={() => toast.success("Code resent!")}
+                className="text-authPrimary hover:text-authPrimaryHover transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={handleResendCode}
+                disabled={submitting || resendCooldown > 0}
               >
-                Resend
+                {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend'}
               </button>
             </p>
 
