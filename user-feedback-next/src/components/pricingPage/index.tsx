@@ -28,6 +28,7 @@ import type { PricingPageProps, PricingTier, InfoCardData, BillingInterval } fro
 export { PricingCard } from "./PricingCard";
 export { InfoCard } from "./InfoCard";
 export { BillingToggle } from "./BillingToggle";
+export { Navbar } from "./Navbar";
 export * from "./icons";
 export * from "./types";
 

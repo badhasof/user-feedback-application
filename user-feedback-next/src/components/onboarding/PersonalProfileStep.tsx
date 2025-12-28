@@ -58,7 +58,7 @@ export const PersonalProfileStep: React.FC<PersonalProfileStepProps> = ({
     <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6">
       <div className="text-center mb-2">
         <h1 className="text-3xl font-light mb-2 tracking-tight text-white">
-          Let's get to know you
+          Let&apos;s get to know you
         </h1>
         <p className="text-sm text-textMuted">
           Tell us a bit about yourself

@@ -1,9 +1,10 @@
+import Link from 'next/link';
 import styles from './Navbar.module.css';
 
 export function Navbar() {
   return (
     <div className={styles.wrapper}>
-      <a className={styles.logoContainer} href="/">
+      <Link className={styles.logoContainer} href="/">
         <img
           alt="Browserbase"
           loading="lazy"
@@ -11,7 +12,7 @@ export function Navbar() {
           height={32}
           src="https://www.browserbase.com/assets/browserbase_logo_text.svg"
         />
-      </a>
+      </Link>
 
       <nav className={styles.itemsWrapper}>
         <div className={styles.dropdownsContainer}>

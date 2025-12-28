@@ -207,7 +207,7 @@ const AuthScreen: React.FC = () => {
             </Button>
 
             <p className="text-sm text-textMuted text-center">
-              Didn't receive the code?{' '}
+              Didn&apos;t receive the code?{' '}
               <button
                 type="button"
                 className="text-authPrimary hover:text-authPrimaryHover transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"

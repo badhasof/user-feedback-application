@@ -46,11 +46,11 @@ function Content() {
       </Unauthenticated>
 
       <Authenticated>
-        {hasOnboarded === false ? (
+        {loggedInUser && (hasOnboarded === false ? (
           <OnboardingFlow user={loggedInUser} />
         ) : (
           <FeedbackApp user={loggedInUser} />
-        )}
+        ))}
       </Authenticated>
     </>
   );
