@@ -9,9 +9,24 @@ import {
 } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { TeamProvider, useTeam } from "@/contexts/TeamContext";
+import { NavigationProvider } from "@/contexts/NavigationContext";
+import { WorkspaceThemeProvider } from "./WorkspaceThemeProvider";
 import { NoTeamsState } from "./NoTeamsState";
 
-function FeedbackAppContent({ user }: { user: any }) {
+interface UserWithProfile {
+  _id: string;
+  name?: string;
+  email?: string;
+  isAnonymous?: boolean;
+  profile?: {
+    name?: string;
+    company?: string;
+    role?: string;
+    avatarUrl?: string | null;
+  } | null;
+}
+
+function FeedbackAppContent({ user }: { user: UserWithProfile }) {
   const { teams, activeTeam, isLoading } = useTeam();
 
   // Loading state
@@ -26,38 +41,42 @@ function FeedbackAppContent({ user }: { user: any }) {
     );
   }
 
-  // No teams state - show onboarding
+  // No teams state - show team creation
   if (teams.length === 0 || !activeTeam) {
     return <NoTeamsState />;
   }
 
   // Normal dashboard view
   return (
-    <SidebarProvider>
-      <AppSidebar />
-      <SidebarInset>
-        <header className="flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0f0f10]">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1 text-neutral-400 hover:text-neutral-200 hover:bg-white/5" />
-            <Separator
-              orientation="vertical"
-              className="mr-2 h-4 bg-white/10"
-            />
-            <span className="text-sm font-medium text-neutral-200">
-              Dashboard
-            </span>
-          </div>
-        </header>
-        <Dashboard user={user} />
-      </SidebarInset>
-    </SidebarProvider>
+    <WorkspaceThemeProvider>
+      <SidebarProvider>
+        <AppSidebar />
+        <SidebarInset className="overflow-x-hidden">
+          <header className="flex h-14 shrink-0 items-center gap-2 border-b border-white/5 bg-[#0f0f10]">
+            <div className="flex items-center gap-2 px-4">
+              <SidebarTrigger className="-ml-1 text-neutral-400 hover:text-neutral-200 hover:bg-white/5" />
+              <Separator
+                orientation="vertical"
+                className="mr-2 h-4 bg-white/10"
+              />
+              <span className="text-sm font-medium text-neutral-200">
+                Dashboard
+              </span>
+            </div>
+          </header>
+          <Dashboard user={user} />
+        </SidebarInset>
+      </SidebarProvider>
+    </WorkspaceThemeProvider>
   );
 }
 
-export function FeedbackApp({ user }: { user: any }) {
+export function FeedbackApp({ user }: { user: UserWithProfile }) {
   return (
     <TeamProvider>
-      <FeedbackAppContent user={user} />
+      <NavigationProvider>
+        <FeedbackAppContent user={user} />
+      </NavigationProvider>
     </TeamProvider>
   );
 }

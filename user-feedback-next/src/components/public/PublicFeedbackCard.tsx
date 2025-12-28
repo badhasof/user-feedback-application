@@ -196,7 +196,7 @@ export function PublicFeedbackCard({ item, hasVoted, onVote, viewMode = 'list', 
             />
             <button
               onClick={handleAddComment}
-              className="px-4 py-2.5 bg-blue-600 text-white text-[13px] font-normal rounded-lg hover:bg-blue-500 transition-colors"
+              className="brand-button px-4 py-2.5 text-[13px] font-normal rounded-lg"
             >
               Post
             </button>

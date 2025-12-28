@@ -60,10 +60,10 @@ export function TeamSwitcher() {
                 <Plus className="size-4 text-neutral-500" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold text-neutral-400">
-                  Create a team
+                <span className="truncate font-normal text-textMuted">
+                  Create a workspace
                 </span>
-                <span className="truncate text-xs text-neutral-500">
+                <span className="truncate text-xs text-textMuted">
                   Get started
                 </span>
               </div>
@@ -80,6 +80,11 @@ export function TeamSwitcher() {
 
   const ActiveIcon = getIconComponent(activeTeam.iconName);
 
+  // Build style for brand color
+  const brandColorStyle = activeTeam.brandColor
+    ? { backgroundColor: activeTeam.brandColor }
+    : undefined;
+
   return (
     <>
       <SidebarMenu>
@@ -90,11 +95,22 @@ export function TeamSwitcher() {
                 size="lg"
                 className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
               >
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <ActiveIcon className="size-4" />
-                </div>
+                {activeTeam.logoUrl ? (
+                  <img
+                    src={activeTeam.logoUrl}
+                    alt={`${activeTeam.name} logo`}
+                    className="size-8 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div
+                    className={`flex aspect-square size-8 items-center justify-center rounded-lg text-white ${!activeTeam.brandColor ? 'bg-authPrimary' : ''}`}
+                    style={brandColorStyle}
+                  >
+                    <ActiveIcon className="size-4" />
+                  </div>
+                )}
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">
+                  <span className="truncate font-normal">
                     {activeTeam.name}
                   </span>
                   <span className="truncate text-xs">{activeTeam.plan}</span>
@@ -109,19 +125,33 @@ export function TeamSwitcher() {
               sideOffset={4}
             >
               <DropdownMenuLabel className="text-xs text-muted-foreground">
-                Teams
+                Workspaces
               </DropdownMenuLabel>
               {teams.map((team, index) => {
                 const TeamIcon = getIconComponent(team.iconName);
+                const teamBrandStyle = team.brandColor
+                  ? { backgroundColor: team.brandColor }
+                  : undefined;
                 return (
                   <DropdownMenuItem
                     key={team._id}
                     onClick={() => setActiveTeam(team)}
                     className="gap-2 p-2"
                   >
-                    <div className="flex size-6 items-center justify-center rounded-sm border">
-                      <TeamIcon className="size-4 shrink-0" />
-                    </div>
+                    {team.logoUrl ? (
+                      <img
+                        src={team.logoUrl}
+                        alt={`${team.name} logo`}
+                        className="size-6 rounded-sm object-cover"
+                      />
+                    ) : (
+                      <div
+                        className={`flex size-6 items-center justify-center rounded-sm ${!team.brandColor ? 'border' : ''}`}
+                        style={teamBrandStyle}
+                      >
+                        <TeamIcon className={`size-4 shrink-0 ${team.brandColor ? 'text-white' : ''}`} />
+                      </div>
+                    )}
                     {team.name}
                     <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
                   </DropdownMenuItem>
@@ -136,7 +166,7 @@ export function TeamSwitcher() {
                   <Plus className="size-4" />
                 </div>
                 <div className="font-medium text-muted-foreground">
-                  Add team
+                  Add workspace
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>

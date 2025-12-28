@@ -2,9 +2,10 @@
 
 import { Authenticated, Unauthenticated, useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { SignInForm } from "@/components/SignInForm";
+import AuthScreen from "@/components/auth/AuthScreen";
 import { Toaster } from "sonner";
 import { FeedbackApp } from "@/components/FeedbackApp";
+import { OnboardingFlow } from "@/components/onboarding";
 
 export default function Home() {
   return (
@@ -27,8 +28,10 @@ export default function Home() {
 
 function Content() {
   const loggedInUser = useQuery(api.auth.loggedInUser);
+  const hasOnboarded = useQuery(api.userProfiles.hasCompletedOnboarding);
 
-  if (loggedInUser === undefined) {
+  // Show loading while checking auth and onboarding status
+  if (loggedInUser === undefined || (loggedInUser && hasOnboarded === undefined)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#09090b]">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-neutral-700 border-t-blue-500"></div>
@@ -39,11 +42,15 @@ function Content() {
   return (
     <>
       <Unauthenticated>
-        <SignInForm />
+        <AuthScreen />
       </Unauthenticated>
 
       <Authenticated>
-        <FeedbackApp user={loggedInUser} />
+        {hasOnboarded === false ? (
+          <OnboardingFlow user={loggedInUser} />
+        ) : (
+          <FeedbackApp user={loggedInUser} />
+        )}
       </Authenticated>
     </>
   );

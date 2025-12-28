@@ -21,6 +21,7 @@ import { Id } from "../../convex/_generated/dataModel";
 import { toast } from "sonner";
 import { getSessionId } from "../lib/session";
 import { useTeam } from "@/contexts/TeamContext";
+import { useNavigation } from "@/contexts/NavigationContext";
 import { KanbanBoard, ListView } from "./Kanban";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "./ui/tabs";
 import { FeedbackDialog } from "./FeedbackDialog";
@@ -64,8 +65,8 @@ const COLUMNS = [
 const StatusBadge = ({ status }: { status: string }) => {
   // Matching TaskCard's pill/badge styling
   const styles: Record<string, string> = {
-    'new': 'bg-neutral-800 text-neutral-400 border border-neutral-700',
-    'under-review': 'bg-neutral-800 text-neutral-400 border border-neutral-700',
+    'new': 'bg-neutral-800 text-textMuted border border-authBorder',
+    'under-review': 'bg-neutral-800 text-textMuted border border-authBorder',
     'planned': 'bg-[#1e2738] text-[#60a5fa] border border-[#2b3a55]',
     'in-progress': 'bg-[#352a15] text-[#fbbf24] border border-[#453616]',
     'resolved': 'bg-[#192b23] text-[#4ade80] border border-[#223d2e]',
@@ -95,7 +96,7 @@ const UpvoteButton = ({ votes, active, onClick }: { votes: number; active: boole
       "group flex flex-col items-center justify-center w-14 h-14 rounded-lg border transition-colors",
       active
         ? "bg-[#1e2738] border-[#2b3a55] text-[#60a5fa]"
-        : "bg-[#161616] border-[#2E2E2E] text-neutral-500 hover:border-white/10 hover:text-neutral-300"
+        : "bg-[#1a1a1a] border-authBorder text-textMuted hover:border-textMuted/30 hover:text-textMain"
     )}
   >
     <ChevronUp size={18} className={cn("transition-transform group-hover:-translate-y-0.5", active ? "text-[#60a5fa]" : "")} />
@@ -155,12 +156,12 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
     if (category === "Feature") return "bg-[#1e2738] text-[#60a5fa] border border-[#2b3a55]";
     if (category === "Improvement") return "bg-[#192b23] text-[#4ade80] border border-[#223d2e]";
     if (category === "Bug") return "bg-[#351c1c] text-[#f87171] border border-[#452222]";
-    return "bg-neutral-800 text-neutral-400 border border-neutral-700";
+    return "bg-neutral-800 text-textMuted border border-authBorder";
   };
 
   // Sheet content (shared between views)
   const sheetContent = (
-    <SheetContent className="bg-[#161616] border-l-[#2E2E2E]">
+    <SheetContent className="bg-[#1a1a1a] border-l-authBorder">
       <SheetHeader>
         <div className="flex items-center gap-2 mb-2">
           {item.category && (
@@ -170,35 +171,35 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
           )}
           <StatusBadge status={item.status} />
         </div>
-        <SheetTitle className="text-xl font-normal text-neutral-100">{item.title}</SheetTitle>
-        <SheetDescription className="text-neutral-500">
+        <SheetTitle className="text-xl font-normal text-textMain">{item.title}</SheetTitle>
+        <SheetDescription className="text-textMuted">
           {item.isAnonymous ? 'Anonymous' : 'User'} · {formatDate(item._creationTime)}
         </SheetDescription>
       </SheetHeader>
 
       <div className="mt-6 space-y-6">
-        <p className="text-[15px] text-neutral-300 leading-relaxed">{item.description}</p>
+        <p className="text-[15px] text-textMain leading-relaxed">{item.description}</p>
 
         <div className="space-y-4">
-          <h4 className="text-[12px] font-semibold text-neutral-500 uppercase tracking-wider">Comments</h4>
+          <h4 className="text-[12px] font-normal text-textMuted uppercase tracking-wider">Comments</h4>
 
           {comments === undefined ? (
             <div className="text-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-2 border-neutral-700 border-t-neutral-400 mx-auto"></div>
+              <div className="animate-spin rounded-full h-6 w-6 border-2 border-authBorder border-t-textMuted mx-auto"></div>
             </div>
           ) : comments.length === 0 ? (
-            <p className="text-[13px] text-neutral-600 py-2">No comments yet. Be the first to comment!</p>
+            <p className="text-[13px] text-textMuted py-2">No comments yet. Be the first to comment!</p>
           ) : (
             comments.map((comment) => (
-              <div key={comment._id} className="bg-[#1E1E1E] rounded-lg p-3 space-y-2 border border-[#2E2E2E]">
+              <div key={comment._id} className="bg-[#1f1f1f] rounded-lg p-3 space-y-2 border border-authBorder">
                 <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[8px] text-white font-bold">
+                  <div className="w-5 h-5 rounded-full bg-gradient-to-br from-authPrimary to-authPrimaryHover flex items-center justify-center text-[8px] text-white font-normal">
                     {comment.isAnonymous ? '?' : comment.userName?.charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-[12px] font-medium text-neutral-300">{comment.userName}</span>
-                  <span className="text-[11px] text-neutral-600">{formatDate(comment._creationTime)}</span>
+                  <span className="text-[12px] font-normal text-textMain">{comment.userName}</span>
+                  <span className="text-[11px] text-textMuted">{formatDate(comment._creationTime)}</span>
                 </div>
-                <p className="text-[13px] text-neutral-400 leading-relaxed">{comment.content}</p>
+                <p className="text-[13px] text-textMuted leading-relaxed">{comment.content}</p>
               </div>
             ))
           )}
@@ -210,11 +211,11 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
               onChange={(e) => setNewComment(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
               placeholder="Add a comment..."
-              className="flex-1 px-3 py-2.5 text-[14px] bg-[#1E1E1E] border border-[#2E2E2E] rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 text-neutral-200 placeholder:text-neutral-600"
+              className="flex-1 px-3 py-2.5 text-[14px] bg-[#1f1f1f] border border-authBorder rounded-lg focus:outline-none focus:ring-2 focus:ring-authPrimary/20 focus:border-authPrimary/30 text-textMain placeholder:text-textMuted"
             />
             <button
               onClick={handleAddComment}
-              className="px-4 py-2.5 bg-blue-600 text-white text-[13px] font-normal rounded-lg hover:bg-blue-500 transition-colors"
+              className="brand-button px-4 py-2.5 text-[13px] font-normal rounded-lg"
             >
               Post
             </button>
@@ -233,7 +234,7 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden flex flex-col"
+          className="bg-[#1f1f1f] rounded-xl border border-authBorder hover:border-textMuted/30 transition-colors group overflow-hidden flex flex-col"
         >
           <div className="p-4 flex flex-col flex-1 cursor-pointer" onClick={() => setIsSheetOpen(true)}>
             {/* Header with tags and options */}
@@ -250,27 +251,27 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
                 <DropdownMenuTrigger asChild>
                   <button
                     onClick={(e) => e.stopPropagation()}
-                    className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
+                    className="p-1 text-textMuted hover:text-textMain hover:bg-white/5 rounded transition-colors shrink-0"
                   >
                     <MoreHorizontal size={16} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]" onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                <DropdownMenuContent align="end" className="bg-[#1f1f1f] border-authBorder" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuLabel className="text-textMuted">Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-authBorder" />
                   <DropdownMenuItem
-                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    className="text-textMain focus:bg-authBorder focus:text-white cursor-pointer"
                     onSelect={onEdit}
                   >
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    className="text-textMain focus:bg-authBorder focus:text-white cursor-pointer"
                     onSelect={onAddToKanban}
                   >
                     Add to Kanban
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                  <DropdownMenuSeparator className="bg-authBorder" />
                   <DropdownMenuItem
                     className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
                     onSelect={onDelete}
@@ -282,15 +283,15 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
             </div>
 
             {/* Title */}
-            <h3 className="text-[17px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mb-2">
+            <h3 className="text-[17px] leading-snug font-normal text-white mb-2">
               {item.title}
             </h3>
 
             {/* Description */}
-            <p className="text-[14px] text-neutral-500 leading-relaxed line-clamp-3 flex-1">{item.description}</p>
+            <p className="text-[14px] text-textMuted leading-relaxed line-clamp-3 flex-1">{item.description}</p>
 
             {/* Separator */}
-            <div className="border-t border-[#2E2E2E] mt-4"></div>
+            <div className="border-t border-authBorder mt-4"></div>
 
             {/* Footer with vote and meta */}
             <div className="flex items-center justify-between mt-3">
@@ -300,21 +301,21 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
                   "flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border transition-colors",
                   hasVoted
                     ? "bg-[#1e2738] border-[#2b3a55] text-[#60a5fa]"
-                    : "bg-[#161616] border-[#2E2E2E] text-neutral-500 hover:border-white/10 hover:text-neutral-300"
+                    : "bg-[#1a1a1a] border-authBorder text-textMuted hover:border-textMuted/30 hover:text-textMain"
                 )}
               >
                 <ChevronUp size={14} />
                 <span className="text-[13px] font-semibold">{item.votes}</span>
               </button>
 
-              <div className="flex items-center gap-2 text-[11px] text-neutral-500">
+              <div className="flex items-center gap-2 text-[11px] text-textMuted">
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
                   {item.isAnonymous ? '?' : 'U'}
                 </div>
                 <span className="font-medium">{item.isAnonymous ? 'Anon' : 'User'}</span>
-                <span className="text-neutral-600">·</span>
+                <span className="text-textMuted">·</span>
                 <span>{formatDate(item._creationTime)}</span>
-                <span className="text-neutral-600">·</span>
+                <span className="text-textMuted">·</span>
                 <span className="flex items-center gap-1">
                   <MessageSquare size={11} />
                   {commentCount || 0}
@@ -336,7 +337,7 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95 }}
-        className="bg-[#1E1E1E] rounded-xl border border-[#2E2E2E] hover:border-white/10 transition-colors group overflow-hidden"
+        className="bg-[#1f1f1f] rounded-xl border border-authBorder hover:border-textMuted/30 transition-colors group overflow-hidden"
       >
         <div className="flex gap-3 sm:gap-4 p-4 cursor-pointer" onClick={() => setIsSheetOpen(true)}>
           <UpvoteButton votes={item.votes} active={hasVoted} onClick={(e) => { e.stopPropagation(); onVote(); }} />
@@ -344,34 +345,34 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
           <div className="flex-1 flex flex-col gap-1">
             {/* Title row with tags */}
             <div className="flex items-start justify-between gap-3">
-              <h3 className="text-[19px] leading-snug font-normal text-white group-hover:text-blue-400 transition-colors mt-0.5">
+              <h3 className="text-[19px] leading-snug font-normal text-white mt-0.5">
                 {item.title}
               </h3>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
                     onClick={(e) => e.stopPropagation()}
-                    className="sm:hidden p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors shrink-0"
+                    className="sm:hidden p-1 text-textMuted hover:text-textMain hover:bg-white/5 rounded transition-colors shrink-0"
                   >
                     <MoreHorizontal size={16} />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]" onClick={(e) => e.stopPropagation()}>
-                  <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                <DropdownMenuContent align="end" className="bg-[#1f1f1f] border-authBorder" onClick={(e) => e.stopPropagation()}>
+                  <DropdownMenuLabel className="text-textMuted">Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-authBorder" />
                   <DropdownMenuItem
-                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    className="text-textMain focus:bg-authBorder focus:text-white cursor-pointer"
                     onSelect={onEdit}
                   >
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem
-                    className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                    className="text-textMain focus:bg-authBorder focus:text-white cursor-pointer"
                     onSelect={onAddToKanban}
                   >
                     Add to Kanban
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                  <DropdownMenuSeparator className="bg-authBorder" />
                   <DropdownMenuItem
                     className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
                     onSelect={onDelete}
@@ -391,27 +392,27 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
                   <DropdownMenuTrigger asChild>
                     <button
                       onClick={(e) => e.stopPropagation()}
-                      className="p-1 text-neutral-600 hover:text-neutral-300 hover:bg-white/5 rounded transition-colors"
+                      className="p-1 text-textMuted hover:text-textMain hover:bg-white/5 rounded transition-colors"
                     >
                       <MoreHorizontal size={16} />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-[#1E1E1E] border-[#2E2E2E]" onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenuLabel className="text-neutral-400">Actions</DropdownMenuLabel>
-                    <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                  <DropdownMenuContent align="end" className="bg-[#1f1f1f] border-authBorder" onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuLabel className="text-textMuted">Actions</DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-authBorder" />
                     <DropdownMenuItem
-                      className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                      className="text-textMain focus:bg-authBorder focus:text-white cursor-pointer"
                       onSelect={onEdit}
                     >
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      className="text-neutral-300 focus:bg-[#2E2E2E] focus:text-white cursor-pointer"
+                      className="text-textMain focus:bg-authBorder focus:text-white cursor-pointer"
                       onSelect={onAddToKanban}
                     >
                       Add to Kanban
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className="bg-[#2E2E2E]" />
+                    <DropdownMenuSeparator className="bg-authBorder" />
                     <DropdownMenuItem
                       className="text-red-400 focus:bg-red-500/10 focus:text-red-400 cursor-pointer"
                       onSelect={onDelete}
@@ -434,23 +435,23 @@ const FeedbackCard = ({ item, hasVoted, onVote, onEdit, onDelete, onAddToKanban,
             </div>
 
             {/* Description */}
-            <p className="text-[16px] text-neutral-500 leading-relaxed line-clamp-2">{item.description}</p>
+            <p className="text-[16px] text-textMuted leading-relaxed line-clamp-2">{item.description}</p>
 
             {/* Separator */}
-            <div className="border-t border-[#2E2E2E] mt-5"></div>
+            <div className="border-t border-authBorder mt-5"></div>
 
             {/* Footer meta */}
-            <div className="flex items-center gap-3 text-[11px] text-neutral-500 mt-3">
+            <div className="flex items-center gap-3 text-[11px] text-textMuted mt-3">
               <div className="flex items-center gap-1.5">
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-[7px] text-white font-bold">
                   {item.isAnonymous ? '?' : 'U'}
                 </div>
                 <span className="font-medium">{item.isAnonymous ? 'Anonymous' : 'User'}</span>
               </div>
-              <span className="text-neutral-600">·</span>
+              <span className="text-textMuted">·</span>
               <span>{formatDate(item._creationTime)}</span>
-              <span className="text-neutral-600">·</span>
-              <button className="flex items-center gap-1 hover:text-neutral-300 transition-colors">
+              <span className="text-textMuted">·</span>
+              <button className="flex items-center gap-1 hover:text-textMain transition-colors">
                 <MessageSquare size={11} />
                 <span>{commentCount || 0}</span>
               </button>
@@ -483,28 +484,28 @@ const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, des
   return (
     <motion.div
       layout
-      className={`bg-[#161616] border border-white/5 rounded-2xl overflow-hidden hover:border-white/10 transition-all ${isExpanded ? 'p-6 ring-2 ring-blue-500/10' : 'p-2 items-center flex gap-3'}`}
+      className={`bg-[#1a1a1a] border border-authBorder rounded-2xl overflow-hidden hover:border-textMuted/30 transition-all ${isExpanded ? 'p-6 ring-2 ring-authPrimary/10' : 'p-2 items-center flex gap-3'}`}
     >
       {!isExpanded ? (
         <>
-          <div className="w-8 h-8 rounded-lg bg-[#1E1E1E] flex items-center justify-center text-neutral-500 ml-2">
+          <div className="w-8 h-8 rounded-lg bg-[#1f1f1f] flex items-center justify-center text-textMuted ml-2">
             <Plus size={18} />
           </div>
           <input
             type="text"
             placeholder="I have a suggestion..."
-            className="flex-1 bg-transparent text-sm outline-none h-10 text-neutral-300 placeholder:text-neutral-600"
+            className="flex-1 bg-transparent text-sm outline-none h-10 text-textMain placeholder:text-textMuted"
             onFocus={() => setIsExpanded(true)}
           />
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-500 transition-colors">
+          <button className="brand-button px-4 py-2 rounded-lg text-sm font-medium">
             Submit
           </button>
         </>
       ) : (
         <div className="space-y-4">
           <div className="flex justify-between items-center mb-2">
-            <h3 className="text-sm font-semibold text-neutral-200">Create a new post</h3>
-            <button onClick={() => setIsExpanded(false)} className="text-neutral-500 hover:text-neutral-300">
+            <h3 className="text-sm font-normal text-textMain">Create a new post</h3>
+            <button onClick={() => setIsExpanded(false)} className="text-textMuted hover:text-textMain">
               <X size={16} />
             </button>
           </div>
@@ -514,18 +515,18 @@ const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, des
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Short, descriptive title"
-            className="w-full text-lg font-medium placeholder:text-neutral-600 outline-none border-b border-white/5 pb-2 bg-transparent text-neutral-200"
+            className="w-full text-lg font-normal placeholder:text-textMuted outline-none border-b border-authBorder pb-2 bg-transparent text-textMain"
           />
           <textarea
             rows={3}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Describe your suggestion in detail..."
-            className="w-full text-sm text-neutral-300 placeholder:text-neutral-600 outline-none resize-none bg-transparent"
+            className="w-full text-sm text-textMain placeholder:text-textMuted outline-none resize-none bg-transparent"
           />
-          <div className="flex justify-end gap-2 pt-2 border-t border-white/5">
-            <button onClick={() => setIsExpanded(false)} className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-300 font-medium">Cancel</button>
-            <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-500 flex items-center gap-2">
+          <div className="flex justify-end gap-2 pt-2 border-t border-authBorder">
+            <button onClick={() => setIsExpanded(false)} className="px-4 py-2 text-sm text-textMuted hover:text-textMain font-normal">Cancel</button>
+            <button onClick={handleSubmit} className="brand-button px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
               Submit Post <CornerDownRight size={14} />
             </button>
           </div>
@@ -538,10 +539,10 @@ const CreatePostInput = ({ onSubmit, category }: { onSubmit: (title: string, des
 // Kanban Header Actions - filter, sort, search, new button
 const KanbanHeaderActions = ({ defaultCategory }: { defaultCategory?: "Bug" | "Feature" | "Improvement" | "Other" }) => (
   <div className="flex items-center gap-4 ml-auto">
-    <div className="flex items-center gap-3 text-neutral-400">
-      <button className="hover:text-neutral-200 transition-colors"><Filter size={18} /></button>
-      <button className="hover:text-neutral-200 transition-colors"><ArrowUpDown size={18} /></button>
-      <button className="hover:text-neutral-200 transition-colors"><Search size={18} /></button>
+    <div className="flex items-center gap-3 text-textMuted">
+      <button className="hover:text-textMain transition-colors"><Filter size={18} /></button>
+      <button className="hover:text-textMain transition-colors"><ArrowUpDown size={18} /></button>
+      <button className="hover:text-textMain transition-colors"><Search size={18} /></button>
     </div>
     <FeedbackDialog defaultCategory={defaultCategory} />
   </div>
@@ -560,7 +561,7 @@ interface FeedbackItem {
 
 const Dashboard = ({ user }: { user: any }) => {
   const { activeTeam } = useTeam();
-  const [activeTab, setActiveTab] = useState('features');
+  const { activeView, quickFilter, setActiveView } = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
   const [feedbackToEdit, setFeedbackToEdit] = useState<FeedbackItem | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -714,12 +715,31 @@ const Dashboard = ({ user }: { user: any }) => {
 
   // Filter Logic
   const getFilteredItems = () => {
-    if (activeTab === 'roadmap') return roadmapItems || [];
+    if (activeView === 'roadmap') return roadmapItems || [];
 
     let items = feedbackList || [];
-    if (activeTab === 'bugs') items = items.filter(i => i.category === 'Bug');
-    if (activeTab === 'features') items = items.filter(i => i.category === 'Feature' || i.category === 'Improvement');
 
+    // Category filter based on activeView
+    if (activeView === 'bugs') {
+      items = items.filter(i => i.category === 'Bug');
+    } else if (activeView === 'features') {
+      items = items.filter(i => i.category === 'Feature');
+    } else if (activeView === 'improvements') {
+      items = items.filter(i => i.category === 'Improvement');
+    } else if (activeView === 'dashboard' || activeView === 'all') {
+      // Show all feedback
+    }
+    // Note: 'changelog' view is handled separately
+
+    // Apply quick filters
+    if (quickFilter === 'voted') {
+      items = [...items].sort((a, b) => b.votes - a.votes);
+    } else if (quickFilter === 'recent') {
+      items = [...items].sort((a, b) => b._creationTime - a._creationTime);
+    }
+    // Note: 'mine' filter would need user ID tracking
+
+    // Search filter
     if (searchQuery) {
       items = items.filter(i => i.title.toLowerCase().includes(searchQuery.toLowerCase()));
     }
@@ -781,46 +801,59 @@ const Dashboard = ({ user }: { user: any }) => {
   }, [moveTask, teamId]);
 
   return (
-    <div className="flex-1 bg-[#09090b] font-sans text-neutral-200 overflow-auto">
+    <div className="flex-1 bg-authBackground font-sans text-textMain overflow-y-auto overflow-x-hidden">
+      {/* Banner Image */}
+      {activeTeam?.bannerUrl && (
+        <div className="w-full h-48 md:h-64 overflow-hidden">
+          <img
+            src={activeTeam.bannerUrl}
+            alt={`${activeTeam.name} banner`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
       {/* Main Content */}
-      <main className="p-6 md:p-8">
+      <main className="p-6 md:p-8 overflow-x-hidden">
         {/* Hero / Intro */}
         <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
           <div className="space-y-2 max-w-lg">
-            <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-neutral-100">Help us build a better product.</h2>
-            <p className="text-neutral-500 text-sm md:text-base">
-              Vote on existing requests or suggest a new feature. We read every piece of feedback.
+            <h2 className="text-3xl md:text-4xl font-light tracking-tight text-white">
+              {activeTeam?.tagline || "Help us build a better product."}
+            </h2>
+            <p className="text-textMuted text-sm md:text-base">
+              {activeTeam?.description || "Vote on existing requests or suggest a new feature. We read every piece of feedback."}
             </p>
           </div>
 
           {/* Search Bar */}
           <div className="w-full md:w-64 relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-600 group-focus-within:text-neutral-400 transition-colors" size={16} />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-textMuted group-focus-within:text-textMuted transition-colors" size={16} />
             <input
               type="text"
               placeholder="Search feedback..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-[#161616] border border-white/5 rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/30 transition-all text-neutral-200 placeholder:text-neutral-600"
+              className="w-full bg-[#1a1a1a] border border-authBorder rounded-full py-2 pl-10 pr-4 text-sm outline-none focus:ring-2 focus:ring-authPrimary/20 focus:border-authPrimary/30 transition-all text-textMain placeholder:text-textMuted"
             />
           </div>
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex overflow-x-auto no-scrollbar border-b border-white/5 mb-8 gap-8">
-          {['features', 'bugs', 'roadmap'].map((tab) => (
+        <div className="flex overflow-x-auto no-scrollbar border-b border-authBorder mb-8 gap-8">
+          {(['features', 'bugs', 'roadmap'] as const).map((tab) => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => setActiveView(tab)}
               className={`relative pb-4 text-sm font-medium capitalize transition-colors whitespace-nowrap ${
-                activeTab === tab ? 'text-neutral-100' : 'text-neutral-500 hover:text-neutral-300'
+                activeView === tab ? 'text-textMain' : 'text-textMuted hover:text-textMain'
               }`}
             >
               {tab === 'features' ? 'Feature Requests' : tab === 'bugs' ? 'Bug Reports' : 'Roadmap'}
-              {activeTab === tab && (
+              {activeView === tab && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute bottom-0 left-0 w-full h-0.5 bg-blue-500"
+                  className="absolute bottom-0 left-0 w-full h-0.5 bg-authPrimary"
                 />
               )}
             </button>
@@ -828,23 +861,23 @@ const Dashboard = ({ user }: { user: any }) => {
         </div>
 
         {/* Tab Content */}
-        <div className="min-h-[400px] overflow-hidden">
-          {activeTab === 'roadmap' ? (
+        <div className="min-h-[400px]">
+          {activeView === 'roadmap' ? (
             // Roadmap Kanban View - using exact UI component
             kanbanTasks === undefined ? (
               <div className="text-center py-12 w-full">
-                <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-4 border-authBorder border-t-authPrimary mx-auto"></div>
               </div>
             ) : tasks.length === 0 ? (
               <div className="text-center py-16">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#161616] flex items-center justify-center">
-                  <LayoutGrid size={24} className="text-neutral-600" />
+                  <LayoutGrid size={24} className="text-textMuted" />
                 </div>
-                <p className="text-lg font-medium text-neutral-400">Roadmap coming soon</p>
-                <p className="text-sm text-neutral-600 mt-1">Check back later for updates on our plans</p>
+                <p className="text-lg font-medium text-textMuted">Roadmap coming soon</p>
+                <p className="text-sm text-textMuted mt-1">Check back later for updates on our plans</p>
               </div>
             ) : (
-              <Tabs defaultValue="board" className="w-full max-w-full">
+              <Tabs defaultValue="board" className="w-full min-w-0">
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 px-2 mb-6">
                   <TabsList>
                     <TabsTrigger value="board">
@@ -858,8 +891,8 @@ const Dashboard = ({ user }: { user: any }) => {
                   </TabsList>
                   <KanbanHeaderActions defaultCategory="Feature" />
                 </div>
-                <TabsContent value="board" className="w-full max-w-full">
-                  <div className="pb-2">
+                <TabsContent value="board" className="min-w-0">
+                  <div className="min-w-0 overflow-x-auto pb-2">
                     <KanbanBoard tasks={tasks} setTasks={setTasks} columns={COLUMNS} onRemoveFromKanban={handleRemoveFromKanban} onCreateTask={handleCreateTask} />
                   </div>
                 </TabsContent>
@@ -882,17 +915,17 @@ const Dashboard = ({ user }: { user: any }) => {
                     List View
                   </TabsTrigger>
                 </TabsList>
-                <KanbanHeaderActions defaultCategory={activeTab === 'bugs' ? 'Bug' : 'Feature'} />
+                <KanbanHeaderActions defaultCategory={activeView === 'bugs' ? 'Bug' : 'Feature'} />
               </div>
               <TabsContent value="board">
                 <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <AnimatePresence>
                     {feedbackList === undefined ? (
                       <div className="text-center py-12 col-span-full">
-                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-authBorder border-t-authPrimary mx-auto"></div>
                       </div>
                     ) : filteredItems.length === 0 ? (
-                      <div className="py-20 text-center text-neutral-500 col-span-full">
+                      <div className="py-20 text-center text-textMuted col-span-full">
                         <p>No posts found matching your criteria.</p>
                       </div>
                     ) : (
@@ -918,10 +951,10 @@ const Dashboard = ({ user }: { user: any }) => {
                   <AnimatePresence>
                     {feedbackList === undefined ? (
                       <div className="text-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-neutral-700 border-t-blue-500 mx-auto"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-4 border-authBorder border-t-authPrimary mx-auto"></div>
                       </div>
                     ) : filteredItems.length === 0 ? (
-                      <div className="py-20 text-center text-neutral-500">
+                      <div className="py-20 text-center text-textMuted">
                         <p>No posts found matching your criteria.</p>
                       </div>
                     ) : (
@@ -958,18 +991,18 @@ const Dashboard = ({ user }: { user: any }) => {
 
         {/* Delete Confirmation Dialog */}
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-          <DialogContent className="sm:max-w-[340px] bg-[#161616] border-white/5 p-0 gap-0">
+          <DialogContent className="sm:max-w-[340px] bg-[#1a1a1a] border-authBorder p-0 gap-0">
             <div className="p-6">
-              <DialogTitle className="text-lg font-medium text-neutral-100">Delete this post?</DialogTitle>
-              <p className="text-sm text-neutral-500 mt-2">This action cannot be undone.</p>
+              <DialogTitle className="text-lg font-normal text-textMain">Delete this post?</DialogTitle>
+              <p className="text-sm text-textMuted mt-2">This action cannot be undone.</p>
             </div>
-            <div className="flex justify-end gap-3 px-6 py-4 border-t border-white/5">
+            <div className="flex justify-end gap-3 px-6 py-4 border-t border-authBorder">
               <button
                 onClick={() => {
                   setIsDeleteDialogOpen(false);
                   setFeedbackToDelete(null);
                 }}
-                className="px-4 py-2 text-sm text-neutral-500 hover:text-neutral-300 font-medium transition-colors"
+                className="px-4 py-2 text-sm text-textMuted hover:text-textMain font-medium transition-colors"
               >
                 Cancel
               </button>

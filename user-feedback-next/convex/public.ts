@@ -12,12 +12,25 @@ export const getTeamBySlug = query({
 
     if (!team) return null;
 
-    // Return only public-safe fields
+    // Get image URLs from storage
+    const logoUrl = team.logoStorageId
+      ? await ctx.storage.getUrl(team.logoStorageId)
+      : null;
+    const bannerUrl = team.bannerStorageId
+      ? await ctx.storage.getUrl(team.bannerStorageId)
+      : null;
+
+    // Return public-safe fields including portal customization
     return {
       _id: team._id,
       name: team.name,
       slug: team.slug,
       iconName: team.iconName,
+      brandColor: team.brandColor || null,
+      logoUrl,
+      bannerUrl,
+      tagline: team.tagline || null,
+      description: team.description || null,
     };
   },
 });

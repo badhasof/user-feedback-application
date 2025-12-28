@@ -94,9 +94,20 @@ export const listUserTeams = query({
       memberships.map(async (membership) => {
         const team = await ctx.db.get(membership.teamId);
         if (!team) return null;
+
+        // Resolve image URLs from storage
+        const logoUrl = team.logoStorageId
+          ? await ctx.storage.getUrl(team.logoStorageId)
+          : null;
+        const bannerUrl = team.bannerStorageId
+          ? await ctx.storage.getUrl(team.bannerStorageId)
+          : null;
+
         return {
           ...team,
           role: membership.role,
+          logoUrl,
+          bannerUrl,
         };
       })
     );
@@ -131,9 +142,19 @@ export const getTeam = query({
       return null;
     }
 
+    // Get image URLs from storage
+    const logoUrl = team.logoStorageId
+      ? await ctx.storage.getUrl(team.logoStorageId)
+      : null;
+    const bannerUrl = team.bannerStorageId
+      ? await ctx.storage.getUrl(team.bannerStorageId)
+      : null;
+
     return {
       ...team,
       role: membership.role,
+      logoUrl,
+      bannerUrl,
     };
   },
 });
@@ -145,6 +166,11 @@ export const updateTeam = mutation({
     name: v.optional(v.string()),
     iconName: v.optional(v.string()),
     plan: v.optional(v.string()),
+    brandColor: v.optional(v.string()),
+    logoStorageId: v.optional(v.id("_storage")),
+    bannerStorageId: v.optional(v.id("_storage")),
+    tagline: v.optional(v.string()),
+    description: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const userId = await getAuthUserId(ctx);
@@ -164,22 +190,91 @@ export const updateTeam = mutation({
       throw new Error("Not authorized to update this team");
     }
 
-    // Build update object
-    const updates: Partial<{
-      name: string;
-      iconName: string;
-      plan: string;
-    }> = {};
+    // Build update object with all possible fields
+    const updates: Record<string, unknown> = {};
 
     if (args.name !== undefined) updates.name = args.name;
     if (args.iconName !== undefined) updates.iconName = args.iconName;
     if (args.plan !== undefined) updates.plan = args.plan;
+    if (args.brandColor !== undefined) updates.brandColor = args.brandColor;
+    if (args.logoStorageId !== undefined) updates.logoStorageId = args.logoStorageId;
+    if (args.bannerStorageId !== undefined) updates.bannerStorageId = args.bannerStorageId;
+    if (args.tagline !== undefined) updates.tagline = args.tagline;
+    if (args.description !== undefined) updates.description = args.description;
 
     if (Object.keys(updates).length > 0) {
       await ctx.db.patch(args.teamId, updates);
     }
 
     return args.teamId;
+  },
+});
+
+// Generate upload URL for team images (logo/banner)
+export const generateTeamUploadUrl = mutation({
+  args: { teamId: v.id("teams") },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Verify the user has admin/owner role
+    const membership = await ctx.db
+      .query("teamMembers")
+      .withIndex("by_team_and_user", (q) =>
+        q.eq("teamId", args.teamId).eq("userId", userId)
+      )
+      .first();
+
+    if (!membership || !["owner", "admin"].includes(membership.role)) {
+      throw new Error("Not authorized to upload files for this team");
+    }
+
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+// Remove team image (logo or banner)
+export const removeTeamImage = mutation({
+  args: {
+    teamId: v.id("teams"),
+    imageType: v.union(v.literal("logo"), v.literal("banner")),
+  },
+  handler: async (ctx, args) => {
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Not authenticated");
+    }
+
+    // Verify the user has admin/owner role
+    const membership = await ctx.db
+      .query("teamMembers")
+      .withIndex("by_team_and_user", (q) =>
+        q.eq("teamId", args.teamId).eq("userId", userId)
+      )
+      .first();
+
+    if (!membership || !["owner", "admin"].includes(membership.role)) {
+      throw new Error("Not authorized to modify this team");
+    }
+
+    const team = await ctx.db.get(args.teamId);
+    if (!team) {
+      throw new Error("Team not found");
+    }
+
+    // Delete the file from storage if it exists
+    const storageId = args.imageType === "logo" ? team.logoStorageId : team.bannerStorageId;
+    if (storageId) {
+      await ctx.storage.delete(storageId);
+    }
+
+    // Clear the field
+    const updateField = args.imageType === "logo" ? "logoStorageId" : "bannerStorageId";
+    await ctx.db.patch(args.teamId, { [updateField]: undefined });
+
+    return true;
   },
 });
 

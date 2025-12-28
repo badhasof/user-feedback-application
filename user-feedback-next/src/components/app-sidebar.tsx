@@ -1,18 +1,20 @@
 "use client";
 
 import * as React from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
 import {
-  BookOpen,
-  Bot,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
+  LayoutDashboard,
+  MessageSquare,
+  Kanban,
+  ExternalLink,
+  TrendingUp,
+  Clock,
+  User,
 } from "lucide-react";
 
 import { NavMain } from "@/components/nav-main";
-import { NavProjects } from "@/components/nav-projects";
+import { NavQuickFilters } from "@/components/nav-quick-filters";
 import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
@@ -23,120 +25,63 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// Navigation data (can be customized per team later)
+// Navigation data for feedback management
 const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
   navMain: [
     {
-      title: "Playground",
+      title: "Dashboard",
       url: "#",
-      icon: SquareTerminal,
+      icon: LayoutDashboard,
+      isActive: true,
+    },
+    {
+      title: "Boards",
+      url: "#",
+      icon: MessageSquare,
       isActive: true,
       items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
+        { title: "Feature Requests", url: "#" },
+        { title: "Bug Reports", url: "#" },
+        { title: "Improvements", url: "#" },
+        { title: "All Feedback", url: "#" },
       ],
     },
     {
-      title: "Models",
+      title: "Planning",
       url: "#",
-      icon: Bot,
+      icon: Kanban,
       items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
+        { title: "Roadmap", url: "#" },
+        { title: "Changelog", url: "#" },
       ],
     },
     {
-      title: "Documentation",
+      title: "Portal",
       url: "#",
-      icon: BookOpen,
+      icon: ExternalLink,
       items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
+        { title: "Public Page", url: "#" },
+        { title: "Customize", url: "#" },
       ],
     },
   ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
+  quickFilters: [
+    { name: "Most Voted", url: "#", icon: TrendingUp },
+    { name: "Recently Added", url: "#", icon: Clock },
+    { name: "My Submissions", url: "#", icon: User },
   ],
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const userProfile = useQuery(api.userProfiles.getUserProfile);
+  const authUser = useQuery(api.auth.loggedInUser);
+
+  const user = {
+    name: userProfile?.fullName || authUser?.name || "User",
+    email: authUser?.email || "",
+    avatar: userProfile?.avatarUrl || "",
+  };
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -144,10 +89,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavQuickFilters filters={data.quickFilters} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

@@ -20,6 +20,11 @@ export interface Team {
   ownerId: Id<"users">;
   createdAt: number;
   role: string;
+  brandColor?: string | null;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  tagline?: string | null;
+  description?: string | null;
 }
 
 interface TeamContextType {

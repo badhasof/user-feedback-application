@@ -75,7 +75,7 @@ export function CreateTeamDialog({
         plan: "Free",
       });
 
-      toast.success("Team created successfully!");
+      toast.success("Workspace created successfully!");
 
       // Set the new team as active
       setActiveTeam({
@@ -96,7 +96,7 @@ export function CreateTeamDialog({
       setSelectedIcon("Building");
       setOpen(false);
     } catch (error: any) {
-      toast.error(error.message || "Failed to create team");
+      toast.error(error.message || "Failed to create workspace");
     } finally {
       setIsSubmitting(false);
     }
@@ -105,55 +105,65 @@ export function CreateTeamDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="sm:max-w-[480px] bg-[#161616] border-white/5 p-0 gap-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[480px] bg-authBackground border-authBorder p-0 gap-0 overflow-hidden">
         <form onSubmit={handleSubmit}>
           {/* Header */}
           <div className="px-8 pt-8 pb-5">
-            <DialogTitle className="text-xl font-normal text-neutral-100 tracking-tight">
-              Create a new team
+            <DialogTitle className="text-2xl font-light text-textMain tracking-tight">
+              Create a new workspace
             </DialogTitle>
-            <p className="text-[15px] text-neutral-500 mt-1.5 font-normal">
-              Teams let you organize feedback for different projects or products
+            <p className="text-sm text-textMuted mt-2">
+              Workspaces let you organize feedback for different projects or products
             </p>
           </div>
 
           {/* Form Fields */}
           <div className="px-8 space-y-5">
-            {/* Team Name */}
-            <div>
-              <label className="block text-sm text-neutral-400 mb-2">
-                Team name
-              </label>
+            {/* Workspace Name */}
+            <div className="relative">
               <input
                 type="text"
+                id="workspace-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="My Awesome Product"
-                className="w-full text-[16px] font-normal placeholder:text-neutral-600 outline-none border border-white/10 rounded-lg px-4 py-3 bg-[#1E1E1E] text-neutral-200 focus:border-blue-500/50 transition-colors"
+                className="peer w-full text-[15px] outline-none border border-authBorder rounded-lg px-4 py-3.5 bg-transparent text-textMain placeholder-transparent focus:border-authPrimary focus:ring-1 focus:ring-authPrimary transition-all duration-200"
               />
+              <label
+                htmlFor="workspace-name"
+                className="absolute left-4 top-3.5 text-[15px] text-textMuted transition-all duration-200 pointer-events-none peer-focus:-top-2.5 peer-focus:text-xs peer-focus:bg-authBackground peer-focus:px-1 peer-focus:text-authPrimary peer-[:not(:placeholder-shown)]:-top-2.5 peer-[:not(:placeholder-shown)]:text-xs peer-[:not(:placeholder-shown)]:bg-authBackground peer-[:not(:placeholder-shown)]:px-1"
+              >
+                Workspace name
+              </label>
             </div>
 
-            {/* Team URL/Slug */}
-            <div>
-              <label className="block text-sm text-neutral-400 mb-2">
-                Team URL
-              </label>
-              <div className="flex items-center gap-0 bg-[#1E1E1E] border border-white/10 rounded-lg overflow-hidden focus-within:border-blue-500/50 transition-colors">
+            {/* Workspace URL/Slug */}
+            <div className="relative">
+              <div className="flex items-center gap-0 bg-transparent border border-authBorder rounded-lg overflow-hidden focus-within:border-authPrimary focus-within:ring-1 focus-within:ring-authPrimary transition-all duration-200">
                 <input
                   type="text"
+                  id="workspace-url"
                   value={slug}
                   onChange={(e) => {
                     setSlug(generateSlug(e.target.value));
                     setSlugEdited(true);
                   }}
                   placeholder="my-product"
-                  className="flex-1 text-[16px] font-normal placeholder:text-neutral-600 outline-none px-4 py-3 bg-transparent text-neutral-200"
+                  className="peer flex-1 text-[15px] outline-none px-4 py-3.5 bg-transparent text-textMain placeholder-transparent"
                 />
-                <span className="text-neutral-500 text-sm px-4 border-l border-white/10 bg-[#141414] py-3">.votivy.com</span>
+                <span className="text-textMuted text-sm px-4 border-l border-authBorder bg-[#1f1f1f] py-3.5">.votivy.com</span>
               </div>
+              <label
+                htmlFor="workspace-url"
+                className={`absolute left-4 text-[15px] text-textMuted transition-all duration-200 pointer-events-none ${
+                  slug ? "-top-2.5 text-xs bg-authBackground px-1" : "top-3.5"
+                }`}
+              >
+                Workspace URL
+              </label>
               {slug && (
-                <p className="text-xs text-neutral-500 mt-2">
-                  Your feedback page: <span className="text-neutral-300">{slug}.votivy.com</span>
+                <p className="text-xs text-textMuted mt-2">
+                  Your feedback page: <span className="text-textMain">{slug}.votivy.com</span>
                 </p>
               )}
               {slug && slugAvailable && !slugAvailable.available && (
@@ -166,7 +176,7 @@ export function CreateTeamDialog({
                 </p>
               )}
               {slug && slugAvailable?.available && (
-                <p className="text-sm text-green-400 mt-2 flex items-center gap-1">
+                <p className="text-sm text-authPrimary mt-2 flex items-center gap-1">
                   <Check size={14} /> Available
                 </p>
               )}
@@ -174,8 +184,8 @@ export function CreateTeamDialog({
 
             {/* Icon Selection */}
             <div>
-              <label className="block text-sm text-neutral-400 mb-2">
-                Team icon
+              <label className="block text-sm text-textMuted mb-2">
+                Workspace icon
               </label>
               <div className="grid grid-cols-10 gap-2">
                 {TEAM_ICONS.map(({ name: iconName, icon: Icon }) => (
@@ -185,8 +195,8 @@ export function CreateTeamDialog({
                     onClick={() => setSelectedIcon(iconName)}
                     className={`p-2 rounded-lg transition-all ${
                       selectedIcon === iconName
-                        ? "bg-blue-600 text-white"
-                        : "bg-[#1E1E1E] text-neutral-400 hover:text-neutral-200 hover:bg-[#252525]"
+                        ? "bg-authPrimary text-white"
+                        : "bg-[#1f1f1f] text-textMuted hover:text-textMain hover:bg-authPrimary/10"
                     }`}
                   >
                     <Icon size={18} />
@@ -197,11 +207,11 @@ export function CreateTeamDialog({
           </div>
 
           {/* Footer */}
-          <div className="px-8 py-5 mt-5 border-t border-white/5 flex items-center justify-end gap-3">
+          <div className="px-8 py-5 mt-5 border-t border-authBorder flex items-center justify-end gap-3">
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="px-5 py-2.5 text-sm text-neutral-500 hover:text-neutral-300 font-normal transition-colors"
+              className="text-sm text-textMuted hover:text-textMain transition-colors"
             >
               Cancel
             </button>
@@ -213,9 +223,9 @@ export function CreateTeamDialog({
                 !slug.trim() ||
                 !slugAvailable?.available
               }
-              className="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-normal hover:bg-blue-500 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2.5 bg-authPrimary text-white rounded-lg text-sm font-normal hover:bg-authPrimaryHover transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? "Creating..." : "Create team"}
+              {isSubmitting ? "Creating..." : "Create workspace"}
               <Plus size={16} />
             </button>
           </div>

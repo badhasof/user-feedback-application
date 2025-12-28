@@ -9,7 +9,7 @@ export function InfoCard({
   external,
 }: InfoCardProps) {
   return (
-    <article className="flex flex-1 flex-col items-center gap-y-8">
+    <article className="flex flex-1 flex-col items-center gap-y-[8px]">
       {icon}
       <h3 className="text-center text-feature-bold text-text-primary">{title}</h3>
       <p className="text-balance text-center text-body text-text-secondary">{description}</p>

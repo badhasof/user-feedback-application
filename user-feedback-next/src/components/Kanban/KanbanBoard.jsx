@@ -134,7 +134,7 @@ export function KanbanBoard({ tasks, setTasks, columns, onRemoveFromKanban, onCr
   }, []);
 
   return (
-    <div className="flex h-full gap-4 overflow-x-auto pb-4 items-start">
+    <div className="flex h-full gap-4 pb-4 items-start">
       <DndContext
         sensors={sensors}
         collisionDetection={customCollisionDetection}

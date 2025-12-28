@@ -1,59 +1,118 @@
 "use client"
 
+import * as React from "react"
 import { Button } from "@/components/ui/button"
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
-} from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+
+interface SettingRowProps {
+  label: string
+  description: string
+  children: React.ReactNode
+  isLast?: boolean
+  horizontal?: boolean
+}
+
+function SettingRow({ label, description, children, isLast, horizontal }: SettingRowProps) {
+  return (
+    <div
+      className={cn(
+        "py-4",
+        !isLast && "border-b border-authBorder"
+      )}
+    >
+      {horizontal ? (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex-1">
+            <span className="text-textMain font-medium">{label}</span>
+            <div className="text-xs text-textMuted mt-0.5">{description}</div>
+          </div>
+          <div>{children}</div>
+        </div>
+      ) : (
+        <div className="w-full space-y-2">
+          <div>
+            <span className="text-textMain font-medium">{label}</span>
+            <div className="text-xs text-textMuted mt-0.5">{description}</div>
+          </div>
+          <div className="w-72">{children}</div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export function AccountContent() {
+  const [name, setName] = React.useState("")
+  const [email, setEmail] = React.useState("")
+  const [isSaving, setIsSaving] = React.useState(false)
+
+  const handleSave = async () => {
+    setIsSaving(true)
+    // TODO: Implement save logic
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    setIsSaving(false)
+  }
+
   return (
-    <form>
-      <FieldSet>
-        <FieldLegend>Profile</FieldLegend>
-        <FieldDescription>Manage your account information.</FieldDescription>
-        <FieldSeparator />
-        <FieldGroup>
-          <Field orientation="responsive">
-            <FieldContent>
-              <FieldLabel htmlFor="name">Name</FieldLabel>
-              <FieldDescription>
-                Your display name visible to team members
-              </FieldDescription>
-            </FieldContent>
-            <Input id="name" placeholder="John Doe" required />
-          </Field>
-          <FieldSeparator />
-          <Field orientation="responsive">
-            <FieldContent>
-              <FieldLabel htmlFor="email">Email</FieldLabel>
-              <FieldDescription>
-                Your email address for notifications and sign in
-              </FieldDescription>
-            </FieldContent>
-            <Input
-              id="email"
-              type="email"
-              placeholder="john@example.com"
-              required
-            />
-          </Field>
-          <FieldSeparator />
-          <Field orientation="responsive">
-            <Button type="submit">Save</Button>
-            <Button type="button" variant="outline">
-              Cancel
-            </Button>
-          </Field>
-        </FieldGroup>
-      </FieldSet>
-    </form>
+    <div className="w-full">
+      <SettingRow
+        label="Name"
+        description="Your display name visible to team members"
+      >
+        <Input
+          id="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="John Doe"
+          className="bg-white/5 border-authBorder text-textMain placeholder:text-textMuted"
+        />
+      </SettingRow>
+
+      <SettingRow
+        label="Email"
+        description="Your email address for notifications and sign in"
+      >
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="john@example.com"
+          className="bg-white/5 border-authBorder text-textMain placeholder:text-textMuted"
+        />
+      </SettingRow>
+
+      <SettingRow
+        label="Password"
+        description="Change your account password"
+        isLast
+        horizontal
+      >
+        <Button
+          variant="outline"
+          className="border-authBorder text-textMain hover:bg-white/5"
+        >
+          Change Password
+        </Button>
+      </SettingRow>
+
+      <div className="flex gap-3 pt-6 border-t border-authBorder mt-2">
+        <Button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="bg-authPrimary hover:bg-authPrimaryHover text-white"
+        >
+          {isSaving ? "Saving..." : "Save Changes"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          className="border-authBorder text-textMain hover:bg-white/5"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
   )
 }
