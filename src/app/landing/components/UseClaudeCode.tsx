@@ -448,23 +448,93 @@ export default function UseClaudeCode() {
                 <div className="w-16" /> {/* Spacer for centering */}
               </div>
 
-              {/* Board Content - Fixed Height with Overflow Hidden */}
-              <div
-                className="p-6 md:p-8 overflow-hidden"
-                style={{ height: "480px" }}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="h-full"
-                  >
-                    {renderAnimation()}
-                  </motion.div>
-                </AnimatePresence>
+              {/* Board Content with Sidebar */}
+              <div className="flex" style={{ height: "480px" }}>
+                {/* Sidebar */}
+                <div className="hidden md:flex flex-col w-[200px] border-r border-[#1f1f1f] bg-[#0a0a0a] p-4">
+                  {/* Workspace */}
+                  <div className="flex items-center gap-2.5 px-2 py-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10a37f] to-[#0d8a6c] flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">V</span>
+                    </div>
+                    <div>
+                      <div className="text-[13px] text-[#ececf1] font-medium">Acme Inc</div>
+                      <div className="text-[11px] text-[#52525b]">Product Board</div>
+                    </div>
+                  </div>
+
+                  {/* Nav Items */}
+                  <div className="space-y-1 mb-6">
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1a1a1a] text-[#ececf1]">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#10a37f]">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                      </svg>
+                      <span className="text-[13px] font-medium">All Feedback</span>
+                      <span className="ml-auto text-[11px] text-[#52525b] bg-[#27272a] px-1.5 py-0.5 rounded">24</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#71717a] hover:bg-[#141414] transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                      </svg>
+                      <span className="text-[13px]">Popular</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#71717a] hover:bg-[#141414] transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
+                        <line x1="16" x2="16" y1="2" y2="6"/>
+                        <line x1="8" x2="8" y1="2" y2="6"/>
+                        <line x1="3" x2="21" y1="10" y2="10"/>
+                      </svg>
+                      <span className="text-[13px]">Roadmap</span>
+                    </div>
+                  </div>
+
+                  {/* Status Filters */}
+                  <div className="text-[11px] text-[#52525b] uppercase tracking-wider px-3 mb-2">Status</div>
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#71717a] hover:bg-[#141414] rounded-lg transition-colors">
+                      <span className="w-2 h-2 rounded-full bg-[#60a5fa]" />
+                      <span className="text-[12px]">Planned</span>
+                      <span className="ml-auto text-[11px] text-[#52525b]">8</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#71717a] hover:bg-[#141414] rounded-lg transition-colors">
+                      <span className="w-2 h-2 rounded-full bg-[#fbbf24]" />
+                      <span className="text-[12px]">In Progress</span>
+                      <span className="ml-auto text-[11px] text-[#52525b]">4</span>
+                    </div>
+                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#71717a] hover:bg-[#141414] rounded-lg transition-colors">
+                      <span className="w-2 h-2 rounded-full bg-[#4ade80]" />
+                      <span className="text-[12px]">Live</span>
+                      <span className="ml-auto text-[11px] text-[#52525b]">12</span>
+                    </div>
+                  </div>
+
+                  {/* Tags */}
+                  <div className="mt-auto pt-4 border-t border-[#1f1f1f]">
+                    <div className="text-[11px] text-[#52525b] uppercase tracking-wider px-3 mb-2">Tags</div>
+                    <div className="flex flex-wrap gap-1.5 px-2">
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1e2738] text-[#60a5fa]">feature</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#2a1f1f] text-[#f87171]">bug</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1f2a1f] text-[#4ade80]">ux</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 p-6 md:p-8 overflow-hidden">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={activeTab}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="h-full"
+                    >
+                      {renderAnimation()}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
               </div>
             </div>
           </div>

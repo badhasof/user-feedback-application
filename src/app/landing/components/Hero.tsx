@@ -3,16 +3,23 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Feedback titles to cycle through
-const feedbackTitles = [
-  "Dark mode support",
-  "Mobile app",
-  "API integrations",
-  "Team analytics",
-  "Slack notifications",
-  "Export to CSV",
-  "Custom branding"
+// Feedback items with titles and status
+const feedbackItems = [
+  { title: "Dark mode support", status: "Planned", category: "Feature" },
+  { title: "Mobile app", status: "Building", category: "Feature" },
+  { title: "API integrations", status: "Shipped", category: "Integration" },
+  { title: "Team analytics", status: "Planned", category: "Analytics" },
+  { title: "Slack notifications", status: "Building", category: "Integration" },
+  { title: "Export to CSV", status: "Shipped", category: "Feature" },
+  { title: "Custom branding", status: "Planned", category: "Design" }
 ];
+
+// Status colors
+const statusColors: Record<string, { bg: string; text: string; dot: string }> = {
+  "Planned": { bg: "#fef3c7", text: "#92400e", dot: "#f59e0b" },
+  "Building": { bg: "#dbeafe", text: "#1e40af", dot: "#3b82f6" },
+  "Shipped": { bg: "#dcfce7", text: "#166534", dot: "#22c55e" }
+};
 
 // Words to cycle through for typewriter
 const typedWords = [
@@ -41,22 +48,43 @@ const ChevronUp = ({ className = "" }: { className?: string }) => (
   </svg>
 );
 
+// Trending/Fire icon
+const TrendingIcon = ({ className = "" }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
+  </svg>
+);
+
 // Animated Feedback Badge Component
 const AnimatedFeedbackBadge: React.FC = () => {
   const [voteCount, setVoteCount] = useState(247);
-  const [titleIndex, setTitleIndex] = useState(0);
+  const [itemIndex, setItemIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+
+  const currentItem = feedbackItems[itemIndex];
+  const currentStatus = statusColors[currentItem.status];
 
   useEffect(() => {
     const interval = setInterval(() => {
       // Start pulse animation
       setIsAnimating(true);
 
-      // After pulse, increment vote and change title
+      // After pulse, increment vote and change item
       setTimeout(() => {
         setVoteCount(prev => prev + 1);
         setTimeout(() => {
-          setTitleIndex(prev => (prev + 1) % feedbackTitles.length);
+          setItemIndex(prev => (prev + 1) % feedbackItems.length);
           setIsAnimating(false);
         }, 300);
       }, 400);
@@ -67,10 +95,10 @@ const AnimatedFeedbackBadge: React.FC = () => {
 
   return (
     <motion.div
-      className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border mb-8"
+      className="inline-flex items-center gap-2 px-2.5 py-1.5 rounded-lg border mb-6 shadow-sm"
       style={{
-        backgroundColor: '#1f1f1f',
-        borderColor: '#2a2b32',
+        backgroundColor: '#ffffff',
+        borderColor: '#e5e4e0',
         fontFamily: '"Satoshi", sans-serif',
       }}
       initial={{ opacity: 0, y: 20 }}
@@ -79,16 +107,16 @@ const AnimatedFeedbackBadge: React.FC = () => {
     >
       {/* Upvote Button */}
       <motion.div
-        className="flex items-center gap-1 px-2 py-1 rounded-md border"
+        className="flex items-center gap-1 px-1.5 py-1 rounded-md border"
         style={{
-          backgroundColor: '#1e2738',
-          borderColor: '#2b3a55',
+          backgroundColor: '#f0fdf4',
+          borderColor: '#bbf7d0',
         }}
         animate={isAnimating ? {
           scale: [1, 1.1, 1],
           boxShadow: [
             "0 0 0 0 rgba(16, 163, 127, 0)",
-            "0 0 12px 2px rgba(16, 163, 127, 0.35)",
+            "0 0 8px 1px rgba(16, 163, 127, 0.3)",
             "0 0 0 0 rgba(16, 163, 127, 0)"
           ]
         } : {}}
@@ -98,16 +126,16 @@ const AnimatedFeedbackBadge: React.FC = () => {
           animate={isAnimating ? { y: [0, -1, 0] } : {}}
           transition={{ duration: 0.3 }}
         >
-          <ChevronUp className="text-[#60a5fa] w-4 h-4" />
+          <ChevronUp className="text-[#10a37f] w-3 h-3" />
         </motion.div>
         <AnimatePresence mode="wait">
           <motion.span
             key={voteCount}
-            className="text-[13px] font-semibold"
-            style={{ color: '#60a5fa' }}
-            initial={{ y: 8, opacity: 0 }}
+            className="text-[11px] font-semibold"
+            style={{ color: '#10a37f' }}
+            initial={{ y: 6, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -8, opacity: 0 }}
+            exit={{ y: -6, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 25 }}
           >
             {voteCount}
@@ -115,20 +143,45 @@ const AnimatedFeedbackBadge: React.FC = () => {
         </AnimatePresence>
       </motion.div>
 
-      {/* Feedback Title */}
-      <div className="overflow-hidden" style={{ minWidth: '120px' }}>
+      {/* Content Section */}
+      <div className="flex items-center gap-2">
+        {/* Feedback Title */}
+        <div className="overflow-hidden" style={{ minWidth: '100px' }}>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={itemIndex}
+              className="block text-[12px] font-medium"
+              style={{ color: '#141413' }}
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -12, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              {currentItem.title}
+            </motion.span>
+          </AnimatePresence>
+        </div>
+
+        {/* Status Tag */}
         <AnimatePresence mode="wait">
-          <motion.span
-            key={titleIndex}
-            className="block text-[14px] font-normal"
-            style={{ color: '#ececf1' }}
-            initial={{ y: 16, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -16, opacity: 0 }}
-            transition={{ duration: 0.3, ease: "easeInOut" }}
+          <motion.div
+            key={currentItem.status}
+            className="flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[9px] font-medium"
+            style={{
+              backgroundColor: currentStatus.bg,
+              color: currentStatus.text,
+            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            transition={{ duration: 0.2 }}
           >
-            {feedbackTitles[titleIndex]}
-          </motion.span>
+            <span
+              className="w-1 h-1 rounded-full"
+              style={{ backgroundColor: currentStatus.dot }}
+            />
+            {currentItem.status}
+          </motion.div>
         </AnimatePresence>
       </div>
     </motion.div>
