@@ -177,3 +177,23 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* Landing page overrides - force light theme */
+.landing-page,
+.landing-page * {
+  --background: #faf9f5;
+  --foreground: #141413;
+}
+
+.landing-page {
+  background: #faf9f5 !important;
+  color: #141413 !important;
+}
+
+.landing-page ::-webkit-scrollbar-track {
+  background: #f0eee6;
+}
+
+.landing-page ::-webkit-scrollbar-thumb {
+  background: #d1cfc5;
+}
