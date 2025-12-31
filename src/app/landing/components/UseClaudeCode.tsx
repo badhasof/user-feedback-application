@@ -71,10 +71,10 @@ const feedbackItems: FeedbackItem[] = [
 ];
 
 const statusConfig = {
-  new: { bg: "bg-[#27272a]", text: "text-[#a1a1aa]", label: "New", dot: "bg-[#71717a]" },
-  planned: { bg: "bg-[#1e2738]", text: "text-[#60a5fa]", label: "Planned", dot: "bg-[#60a5fa]" },
-  building: { bg: "bg-[#352a15]", text: "text-[#fbbf24]", label: "In Progress", dot: "bg-[#fbbf24]" },
-  live: { bg: "bg-[#192b23]", text: "text-[#4ade80]", label: "Live", dot: "bg-[#4ade80]" },
+  new: { bg: "bg-[#f4f4f5]", text: "text-[#52525b]", label: "New", dot: "bg-[#71717a]" },
+  planned: { bg: "bg-[#dbeafe]", text: "text-[#1d4ed8]", label: "Planned", dot: "bg-[#3b82f6]" },
+  building: { bg: "bg-[#fef3c7]", text: "text-[#b45309]", label: "In Progress", dot: "bg-[#f59e0b]" },
+  live: { bg: "bg-[#dcfce7]", text: "text-[#15803d]", label: "Live", dot: "bg-[#22c55e]" },
 };
 
 // Realistic Feedback Card
@@ -95,8 +95,8 @@ const FeedbackCard = ({
   return (
     <motion.div
       layout
-      className={`bg-[#1a1a1a] border rounded-xl p-4 w-full transition-all duration-300 ${
-        isHighlighted ? "border-[#10a37f] shadow-[0_0_20px_rgba(16,163,127,0.15)]" : "border-[#2a2b32]"
+      className={`bg-white border rounded-xl p-4 w-full transition-all duration-300 shadow-sm ${
+        isHighlighted ? "border-[#10a37f] shadow-[0_0_20px_rgba(16,163,127,0.15)]" : "border-[#e5e4e0]"
       }`}
     >
       <div className="flex gap-3">
@@ -104,16 +104,16 @@ const FeedbackCard = ({
         <motion.div
           className={`flex flex-col items-center justify-center min-w-[52px] h-[52px] rounded-lg border transition-all ${
             isVoting
-              ? "bg-[#1e2738] border-[#3b5998] shadow-[0_0_12px_rgba(96,165,250,0.3)]"
-              : "bg-[#1f1f1f] border-[#2a2b32]"
+              ? "bg-[#f0fdf4] border-[#10a37f] shadow-[0_0_12px_rgba(16,163,127,0.2)]"
+              : "bg-[#f8f8f6] border-[#e5e4e0]"
           }`}
           animate={isVoting ? { scale: [1, 1.08, 1] } : {}}
           transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          <ChevronUp className={isVoting ? "text-[#60a5fa]" : "text-[#71717a]"} />
+          <ChevronUp className={isVoting ? "text-[#10a37f]" : "text-[#8e8d89]"} />
           <motion.span
             key={displayVotes}
-            className={`text-sm font-semibold -mt-0.5 ${isVoting ? "text-[#60a5fa]" : "text-[#a1a1aa]"}`}
+            className={`text-sm font-semibold -mt-0.5 ${isVoting ? "text-[#10a37f]" : "text-[#5e5d59]"}`}
             initial={isVoting ? { y: 8, opacity: 0 } : false}
             animate={{ y: 0, opacity: 1 }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -125,7 +125,7 @@ const FeedbackCard = ({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className="text-[#ececf1] text-[15px] font-medium leading-tight">
+            <h4 className="text-[#141413] text-[15px] font-medium leading-tight">
               {item.title}
             </h4>
             <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full flex items-center gap-1.5 ${status.bg} ${status.text}`}>
@@ -133,13 +133,13 @@ const FeedbackCard = ({
               {status.label}
             </span>
           </div>
-          <p className="text-[#71717a] text-[13px] leading-relaxed mb-2 line-clamp-2">
+          <p className="text-[#5e5d59] text-[13px] leading-relaxed mb-2 line-clamp-2">
             {item.description}
           </p>
-          <div className="flex items-center gap-3 text-[12px] text-[#52525b]">
+          <div className="flex items-center gap-3 text-[12px] text-[#8e8d89]">
             <span>{item.author}</span>
             <span className="flex items-center gap-1">
-              <MessageIcon className="text-[#52525b]" />
+              <MessageIcon className="text-[#8e8d89]" />
               {item.comments}
             </span>
           </div>
@@ -199,7 +199,7 @@ const CollectAnimation = () => {
         ))}
       </AnimatePresence>
       {visibleCount === 0 && (
-        <div className="text-center text-[#52525b] text-sm py-20">
+        <div className="text-center text-[#8e8d89] text-sm py-20">
           Waiting for feedback...
         </div>
       )}
@@ -284,7 +284,7 @@ const PrioritizeAnimation = () => {
             }}
           >
             <div className="flex items-center gap-3">
-              <span className="text-[#52525b] text-sm font-medium w-6">#{position + 1}</span>
+              <span className="text-[#8e8d89] text-sm font-medium w-6">#{position + 1}</span>
               <div className="flex-1">
                 <FeedbackCard item={items[idx]} />
               </div>
@@ -305,9 +305,9 @@ const ShipAnimation = () => {
   });
 
   const columns = [
-    { id: "planned", label: "Planned", color: "text-[#60a5fa]", dot: "bg-[#60a5fa]" },
-    { id: "building", label: "In Progress", color: "text-[#fbbf24]", dot: "bg-[#fbbf24]" },
-    { id: "live", label: "Live", color: "text-[#4ade80]", dot: "bg-[#4ade80]" },
+    { id: "planned", label: "Planned", color: "text-[#1d4ed8]", dot: "bg-[#3b82f6]" },
+    { id: "building", label: "In Progress", color: "text-[#b45309]", dot: "bg-[#f59e0b]" },
+    { id: "live", label: "Live", color: "text-[#15803d]", dot: "bg-[#22c55e]" },
   ];
 
   const items = feedbackItems.slice(0, 3);
@@ -335,7 +335,7 @@ const ShipAnimation = () => {
           <div className={`flex items-center gap-2 mb-3 px-1`}>
             <span className={`w-2 h-2 rounded-full ${col.dot}`} />
             <span className={`text-[13px] font-medium ${col.color}`}>{col.label}</span>
-            <span className="text-[12px] text-[#52525b] ml-auto">
+            <span className="text-[12px] text-[#8e8d89] ml-auto">
               {items.filter(item => positions[item.id] === col.id).length}
             </span>
           </div>
@@ -432,17 +432,17 @@ export default function UseClaudeCode() {
         >
           <div className="pt-12 md:pt-16 px-6 md:px-8 pb-0">
             <div
-              className="w-full rounded-xl overflow-hidden border border-[#2a2b32]"
-              style={{ backgroundColor: "#0f0f0f" }}
+              className="w-full rounded-xl overflow-hidden border border-[#e5e4e0] shadow-lg"
+              style={{ backgroundColor: "#ffffff" }}
             >
               {/* Window Header */}
-              <div className="flex items-center justify-between px-4 py-3 border-b border-[#1f1f1f] bg-[#141414]">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-[#e5e4e0] bg-[#f8f8f6]">
                 <div className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full bg-[#ff5f56]" />
                   <div className="w-3 h-3 rounded-full bg-[#ffbd2e]" />
                   <div className="w-3 h-3 rounded-full bg-[#27c93f]" />
                 </div>
-                <span className="text-[13px] text-[#71717a] font-medium">
+                <span className="text-[13px] text-[#5e5d59] font-medium">
                   Votivy Board
                 </span>
                 <div className="w-16" /> {/* Spacer for centering */}
@@ -451,34 +451,34 @@ export default function UseClaudeCode() {
               {/* Board Content with Sidebar */}
               <div className="flex" style={{ height: "480px" }}>
                 {/* Sidebar */}
-                <div className="hidden md:flex flex-col w-[200px] border-r border-[#1f1f1f] bg-[#0a0a0a] p-4">
+                <div className="hidden md:flex flex-col w-[200px] border-r border-[#e5e4e0] bg-[#faf9f5] p-4">
                   {/* Workspace */}
                   <div className="flex items-center gap-2.5 px-2 py-2 mb-4">
                     <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#10a37f] to-[#0d8a6c] flex items-center justify-center">
                       <span className="text-white text-xs font-bold">V</span>
                     </div>
                     <div>
-                      <div className="text-[13px] text-[#ececf1] font-medium">Acme Inc</div>
-                      <div className="text-[11px] text-[#52525b]">Product Board</div>
+                      <div className="text-[13px] text-[#141413] font-medium">Acme Inc</div>
+                      <div className="text-[11px] text-[#8e8d89]">Product Board</div>
                     </div>
                   </div>
 
                   {/* Nav Items */}
                   <div className="space-y-1 mb-6">
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-[#1a1a1a] text-[#ececf1]">
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-white border border-[#e5e4e0] text-[#141413] shadow-sm">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#10a37f]">
                         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                       </svg>
                       <span className="text-[13px] font-medium">All Feedback</span>
-                      <span className="ml-auto text-[11px] text-[#52525b] bg-[#27272a] px-1.5 py-0.5 rounded">24</span>
+                      <span className="ml-auto text-[11px] text-[#5e5d59] bg-[#f0eee6] px-1.5 py-0.5 rounded">24</span>
                     </div>
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#71717a] hover:bg-[#141414] transition-colors">
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#5e5d59] hover:bg-white hover:border hover:border-[#e5e4e0] transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                       </svg>
                       <span className="text-[13px]">Popular</span>
                     </div>
-                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#71717a] hover:bg-[#141414] transition-colors">
+                    <div className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#5e5d59] hover:bg-white hover:border hover:border-[#e5e4e0] transition-colors">
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <rect width="18" height="18" x="3" y="4" rx="2" ry="2"/>
                         <line x1="16" x2="16" y1="2" y2="6"/>
@@ -490,32 +490,32 @@ export default function UseClaudeCode() {
                   </div>
 
                   {/* Status Filters */}
-                  <div className="text-[11px] text-[#52525b] uppercase tracking-wider px-3 mb-2">Status</div>
+                  <div className="text-[11px] text-[#8e8d89] uppercase tracking-wider px-3 mb-2">Status</div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#71717a] hover:bg-[#141414] rounded-lg transition-colors">
-                      <span className="w-2 h-2 rounded-full bg-[#60a5fa]" />
+                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#5e5d59] hover:bg-white rounded-lg transition-colors">
+                      <span className="w-2 h-2 rounded-full bg-[#3b82f6]" />
                       <span className="text-[12px]">Planned</span>
-                      <span className="ml-auto text-[11px] text-[#52525b]">8</span>
+                      <span className="ml-auto text-[11px] text-[#8e8d89]">8</span>
                     </div>
-                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#71717a] hover:bg-[#141414] rounded-lg transition-colors">
-                      <span className="w-2 h-2 rounded-full bg-[#fbbf24]" />
+                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#5e5d59] hover:bg-white rounded-lg transition-colors">
+                      <span className="w-2 h-2 rounded-full bg-[#f59e0b]" />
                       <span className="text-[12px]">In Progress</span>
-                      <span className="ml-auto text-[11px] text-[#52525b]">4</span>
+                      <span className="ml-auto text-[11px] text-[#8e8d89]">4</span>
                     </div>
-                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#71717a] hover:bg-[#141414] rounded-lg transition-colors">
-                      <span className="w-2 h-2 rounded-full bg-[#4ade80]" />
+                    <div className="flex items-center gap-2.5 px-3 py-1.5 text-[#5e5d59] hover:bg-white rounded-lg transition-colors">
+                      <span className="w-2 h-2 rounded-full bg-[#22c55e]" />
                       <span className="text-[12px]">Live</span>
-                      <span className="ml-auto text-[11px] text-[#52525b]">12</span>
+                      <span className="ml-auto text-[11px] text-[#8e8d89]">12</span>
                     </div>
                   </div>
 
                   {/* Tags */}
-                  <div className="mt-auto pt-4 border-t border-[#1f1f1f]">
-                    <div className="text-[11px] text-[#52525b] uppercase tracking-wider px-3 mb-2">Tags</div>
+                  <div className="mt-auto pt-4 border-t border-[#e5e4e0]">
+                    <div className="text-[11px] text-[#8e8d89] uppercase tracking-wider px-3 mb-2">Tags</div>
                     <div className="flex flex-wrap gap-1.5 px-2">
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1e2738] text-[#60a5fa]">feature</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#2a1f1f] text-[#f87171]">bug</span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#1f2a1f] text-[#4ade80]">ux</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#dbeafe] text-[#1d4ed8]">feature</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#fee2e2] text-[#dc2626]">bug</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#15803d]">ux</span>
                     </div>
                   </div>
                 </div>
